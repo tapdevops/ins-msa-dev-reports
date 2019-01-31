@@ -12,6 +12,10 @@
 	const database = require( './config/database.js' );
 	const config = require( './config/app.js' );
 
+	// Global Variable
+	global._directory_base = __dirname;
+	global._directory_root = '';
+
 	// Variable
 	const app = express();
 

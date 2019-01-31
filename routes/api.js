@@ -1,17 +1,57 @@
-const jwt = require( 'jsonwebtoken' );
-const config = require( '../config/app.js' );
-const uuid = require( 'uuid' );
-const nJwt = require( 'njwt' );
-const jwtDecode = require( 'jwt-decode' );
+/*
+|--------------------------------------------------------------------------
+| APP Setup
+|--------------------------------------------------------------------------
+*/
+	// Node Modules
+	const jwt = require( 'jsonwebtoken' );
+	const uuid = require( 'uuid' );
+	const nJwt = require( 'njwt' );
+	const jwtDecode = require( 'jwt-decode' );
+	const routes_versioning = require( 'express-routes-versioning' )();
 
+	// Config Variable
+	const config = require( _directory_base + '/config/app.js' );
+
+	// Controllers Variable
+	const Controllers = {
+		V1: {
+			ReportController: require( _directory_base + '/app/Http/Controllers/v1/ReportController.js' )
+		}
+	}
+
+/*
+|--------------------------------------------------------------------------
+| Module Exports
+|--------------------------------------------------------------------------
+|
+| Note :
+| 	Untuk memanggil setiap API butuh 2 header, yaitu : Authorization dan 
+| 	accept-version.
+| 	Contoh value :
+| 		Authorization: Bearer hJHWHFW88JFWJ56562dwdbw
+| 		accept-version: 1.0.0
+|
+*/
+	module.exports = ( app ) => {
+
+		app.get( '/api/report/class-block', token_verify, routes_versioning( {
+			"1.0.0": Controllers.V1.ReportController.find_v_1_0
+		} ) );
+
+	}
+
+/*
+|--------------------------------------------------------------------------
+| Verify Token
+|--------------------------------------------------------------------------
+*/
 function token_verify( req, res, next ) {
-	// Get auth header value
 	const bearerHeader = req.headers['authorization'];
 
 	if ( typeof bearerHeader !== 'undefined' ) {
 		const bearer = bearerHeader.split( ' ' );
 		const bearer_token = bearer[1];
-
 		req.token = bearer_token;
 
 		nJwt.verify( bearer_token, config.secret_key, config.token_algorithm, ( err, authData ) => {
@@ -29,24 +69,8 @@ function token_verify( req, res, next ) {
 				next();
 			}
 		} );
-		
 	}
 	else {
-		// Forbidden
-		res.sendStatus( 403 );
+		res.sendStatus( 403 ); // Forbidden
 	}
-}
-
-module.exports = ( app ) => {
-
-	// Declare Controllers
-	//const afdeling = require( '../app/controllers/afdeling.js' );
-
-	//app.get( '/sync-mobile/region/:start_date/:end_date', token_verify, region.syncMobile );
-	//app.post( '/region', verifyToken, region.create );
-	//app.get( '/region', token_verify, region.find );
-	//app.get( '/region/:id', verifyToken, region.findOne );
-	//app.put( '/region/:id', verifyToken, region.update );
-	//app.delete( '/region/:id', verifyToken, region.delete );
-
 }
