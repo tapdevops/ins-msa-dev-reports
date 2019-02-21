@@ -19,7 +19,7 @@
 */
 	exports.create_v_1_0 = ( req, res ) => {
 
-		var auth = req.auth;
+		//var auth = req.auth;
 		const set = new InspectionBarisSchema( {
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
 			WERKS_AFD_CODE: req.body.WERKS_AFD_CODE,
