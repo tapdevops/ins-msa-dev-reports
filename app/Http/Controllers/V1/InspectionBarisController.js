@@ -22,6 +22,7 @@
 		//var auth = req.auth;
 		const set = new InspectionBarisSchema( {
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
+			PERIODE: req.body.PERIODE,
 			WERKS_AFD_CODE: req.body.WERKS_AFD_CODE,
 			WERKS_AFD_BLOCK_CODE: req.body.WERKS_AFD_BLOCK_CODE,
 			WERKS: req.body.WERKS,
