@@ -17,7 +17,7 @@
 	const Controllers = {
 		V1: {
 			//ReportBlockController: require( _directory_base + '/app/Http/Controllers/v1/ReportBlockController.js' ),
-			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/v1/InspectionBarisController.js' )
+			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' )
 		}
 	}
 
