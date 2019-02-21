@@ -75,8 +75,11 @@
 	}
 	
 
-	exports.find_v_1_0 = ( req, res ) => {
+	exports.find_v_1_0 = async ( req, res ) => {
+		var query = await InspectionBarisSchema.find({}).select( { _id: 0, __v: 0 } );
+
 		res.json( {
-			message: 'OK'
+			message: 'OK',
+			data: query
 		} )
 	}

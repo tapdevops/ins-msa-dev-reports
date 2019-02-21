@@ -16,7 +16,6 @@
 	// Controllers Variable
 	const Controllers = {
 		V1: {
-			//ReportBlockController: require( _directory_base + '/app/Http/Controllers/v1/ReportBlockController.js' ),
 			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' )
 		}
 	}
@@ -36,11 +35,11 @@
 */
 	module.exports = ( app ) => {
 		
-		//app.get( '/api/report/class-block', token_verify, routes_versioning( {
-		//	"1.0.0": Controllers.V1.ReportBlockController.find_v_1_0
-		//} ) );
+		app.get( '/api/report/inspection-baris', token_verify, routes_versioning( {
+			"1.0.0": Controllers.V1.InspectionBarisController.find_v_1_0
+		} ) );
 
-		app.post( '/api/report/inspection-baris', routes_versioning( {
+		app.post( '/api/report/inspection-baris', token_verify, routes_versioning( {
 			"1.0.0": Controllers.V1.InspectionBarisController.create_v_1_0
 		} ) );
 
