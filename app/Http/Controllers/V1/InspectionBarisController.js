@@ -79,6 +79,7 @@
 		var query = await InspectionBarisSchema.find({}).select( { _id: 0, __v: 0 } );
 
 		res.json( {
+			status: true,
 			message: 'OK',
 			data: query
 		} )
