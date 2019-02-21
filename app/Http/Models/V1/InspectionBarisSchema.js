@@ -2,6 +2,15 @@ const mongoose = require( 'mongoose' );
 
 const InspectionBarisSchema = mongoose.Schema( {
 	BLOCK_INSPECTION_CODE: String,
+	PERIODE: {
+		type: Number,
+		get: v => Math.floor( v ),
+		set: v => Math.floor( v ),
+		alias: 'i',
+		default: function() {
+			return null;
+		}
+	},
 	WERKS_AFD_CODE: String,
 	WERKS_AFD_BLOCK_CODE: String,
 	WERKS: String,
