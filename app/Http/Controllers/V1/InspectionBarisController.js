@@ -76,7 +76,16 @@
 	
 
 	exports.find_v_1_0 = async ( req, res ) => {
-		var query = await InspectionBarisSchema.find({}).select( { _id: 0, __v: 0 } );
+		var query = await InspectionBarisSchema.find({})
+			.select( {
+				_id: 0, 
+				__v: 0 
+			} ).sort( {
+				WERKS: 1,
+				AFD_CODE: 1,
+				BLOCK_CODE: 1,
+				INSPECTION_DATE: 1
+			} );
 
 		res.json( {
 			status: true,
