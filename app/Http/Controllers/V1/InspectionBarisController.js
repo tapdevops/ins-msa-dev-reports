@@ -78,8 +78,13 @@
 	exports.find_v_1_0 = async ( req, res ) => {
 
 		if ( req.params.start_date && req.params.end_date && req.params.location ) {
+			var location = req.params.location
+			if ( location.substr( 0, 1) == '0' )  {
+				location = req.params.location.substr( 1, 10);
+			}
+			
 			var query = await InspectionBarisSchema.find({
-					WERKS_AFD_BLOCK_CODE: new RegExp( '^' + req.params.location ),
+					WERKS_AFD_BLOCK_CODE: new RegExp( '^' + location ),
 					INSPECTION_DATE: {
 						$gte: req.params.start_date,
 						$lte: req.params.end_date
