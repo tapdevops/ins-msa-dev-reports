@@ -79,7 +79,7 @@
 
 		if ( req.params.start_date && req.params.end_date && req.params.location ) {
 			var query = await InspectionBarisSchema.find({
-					WERKS: req.params.location,
+					WERKS_AFD_BLOCK_CODE: new RegExp( '^' + req.params.location ),
 					INSPECTION_DATE: {
 						$gte: req.params.start_date,
 						$lte: req.params.end_date
