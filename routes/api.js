@@ -35,7 +35,7 @@
 */
 	module.exports = ( app ) => {
 		
-		app.get( '/api/report/inspection-baris', routes_versioning( {
+		app.get( '/api/report/inspection-baris/:location/:start_date/:end_date', routes_versioning( {
 			"1.0.0": Controllers.V1.InspectionBarisController.find_v_1_0
 		} ) );
 
