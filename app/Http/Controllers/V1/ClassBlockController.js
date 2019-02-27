@@ -22,6 +22,7 @@
 			WERKS: req.body.WERKS,
 			AFD_CODE: req.body.AFD_CODE,
 			BLOCK_CODE: req.body.BLOCK_CODE,
+			CLASS_BLOCK: req.body.CLASS_BLOCK,
 			WERKS_AFD_BLOCK_CODE: req.body.WERKS + req.body.AFD_CODE + req.body.BLOCK_CODE,
 			WERKS_AFD_CODE: req.body.WERKS + req.body.AFD_CODE,
 			DATE_TIME: req.body.DATE_TIME,
