@@ -44,7 +44,6 @@
 		console.log( config.app_name + ' running on ' + config.app_port )
 	} );
 
-
 // Routes
 app.get( '/', ( req, res ) => {
 	res.json( { 'message': config.app_name } )
