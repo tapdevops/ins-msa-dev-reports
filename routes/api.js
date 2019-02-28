@@ -37,7 +37,7 @@
 	module.exports = ( app ) => {
 
 		app.post( '/api/report/class-block', routes_versioning( {
-			"1.0.0": Controllers.V1.ClassBlockController.create_v_1_0
+			"1.0.0": Controllers.V1.ClassBlockController.create_or_update_v_1_0
 		} ) );
 		
 		app.get( '/api/report/inspection-baris/:location/:start_date/:end_date', routes_versioning( {
