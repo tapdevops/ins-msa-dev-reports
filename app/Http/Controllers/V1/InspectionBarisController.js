@@ -76,7 +76,14 @@
 	
 
 	exports.find_v_1_0 = async ( req, res ) => {
+		var query = await InspectionBarisSchema.find();
+		res.json( {
+			status: true,
+			message: 'Success!',
+			data: query
+		} );
 
+		/*
 		if ( req.params.start_date && req.params.end_date && req.params.location ) {
 			var location = req.params.location
 			if ( location.substr( 0, 1) == '0' )  {
@@ -106,4 +113,5 @@
 				data: query
 			} );
 		}
+		*/
 	}

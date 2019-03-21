@@ -65,7 +65,6 @@
 			body.UPDATE_TIME = req.body.UPDATE_TIME;
 			body.DELETE_TIME = req.body.DELETE_TIME;
 			var set = new ClassBlockSchema( body );
-
 			set.save()
 			.then( data => {
 				if ( !data ) {
