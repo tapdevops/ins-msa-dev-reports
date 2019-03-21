@@ -5,8 +5,9 @@ module.exports = {
 	| App Config
 	|--------------------------------------------------------------------------
 	*/
-	app_port: process.env.PORT || 3013,
-	app_name: 'Microservice Report',
+	port: process.env.PORT || 3013,
+	name: 'Microservice Report',
+	env: 'development', // production, qa, development
 
 	/*
 	|--------------------------------------------------------------------------
@@ -49,5 +50,6 @@ module.exports = {
 		delete_404: 'Error! Data gagal dihapus ',
 		delete_500: 'Error! Terjadi kesalahan dalam penghapusan data ',
 	}
+
 
 }

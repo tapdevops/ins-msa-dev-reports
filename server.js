@@ -4,51 +4,57 @@
 |--------------------------------------------------------------------------
 */
 	// Node Modules
+	const bodyParser = require( 'body-parser' );
 	const express = require( 'express' );
 	const mongoose = require( 'mongoose' );
-	const bodyParser = require( 'body-parser' );
 
-	// Config Variable
-	const database = require( './config/database.js' );
-	const config = require( './config/app.js' );
+	// Primary Variable
+	const app = express();
 
-	// Global Variable
+	// Config
+	const config = {};
+		  config.app = require( './config/app.js' );
+		  config.database = require( './config/database.js' )[config.app.env];
+
+/*
+|--------------------------------------------------------------------------
+| Global APP Init
+|--------------------------------------------------------------------------
+*/
 	global._directory_base = __dirname;
 	global._directory_root = '';
-
-	// Variable
-	const app = express();
 
 /*
 |--------------------------------------------------------------------------
 | APP Init
 |--------------------------------------------------------------------------
 */
+	// Parse request of content-type - application/x-www-form-urlencoded
+	app.use( bodyParser.urlencoded( { extended: false } ) );
+
+	// Parse request of content-type - application/json
+	app.use( bodyParser.json() );
+
 	// Setup Database
 	mongoose.Promise = global.Promise;
-	mongoose.connect( database.url, {
+	mongoose.connect( config.database.url, {
 		useNewUrlParser: true,
-		ssl: database.ssl
+		ssl: config.database.ssl
 	} ).then( () => {
 		console.log( 'Successfully connected to the Database' );
 	} ).catch( err => {
 		console.log( 'Could not connect to the Database. Exiting application.' )
 	} );
 
-	// Setup App
-	app.use( bodyParser.urlencoded( { extended: true } ) );
-	app.use( bodyParser.json() );
-	app.listen( config.app_port, () => {
-		var host = config.ip_address;
-		var port = config.app_port;
-		console.log( config.app_name + ' running on ' + config.app_port )
+	// Server Running Message
+	app.listen( config.app.port, () => {
+		console.log( 'Server ' + config.app.name + ' Berjalan di port ' + config.app.port );
 	} );
 
-// Routes
-app.get( '/', ( req, res ) => {
-	res.json( { 'message': config.app_name } )
-} );
+	// Routing
+	app.get( '/', ( req, res ) => {
+		res.json( { 'message': config.app.name } )
+	} );
 
-// Require Bisnis Area Routes
-require( './routes/api.js' )( app );
-module.exports = app;
+	require( './routes/api.js' )( app );
+	module.exports = app;
