@@ -7,7 +7,7 @@
  |
  */
  	// Models
-	const ClassBlockSchema = require( _directory_base + '/app/Http/Models/V1/ClassBlockSchema.js' );
+	const ClassBlockOpbalSchema = require( _directory_base + '/app/Http/Models/V1/ClassBlockOpbalSchema.js' );
 
 	// Variable
 	const config = require( _directory_base + '/config/app.js' );
@@ -18,6 +18,7 @@
 |--------------------------------------------------------------------------
 */
 	exports.create_or_update_v_1_0 = async ( req, res ) => {
+		/*
 		var body = {
 			WERKS: req.body.WERKS,
 			AFD_CODE: req.body.AFD_CODE,
@@ -86,5 +87,25 @@
 					data: []
 				} );
 			} );
-		}
+		}*/
 	}
+
+	exports.find = async ( req, res ) => {
+		var query = await ClassBlockOpbalSchema.find({}).select({_id:0});
+		var results = [];
+		query.forEach( function( q ) {
+			results.push( {
+				"WERKS_AFD_CODE": q.WERKS + q.AFD_CODE,
+				"WERKS_AFD_BLOCK_CODE": q.WERKS + q.AFD_CODE + q.BLOCK_CODE,
+				"WERKS": q.WERKS,
+				"AFD_CODE": q.AFD_CODE,
+				"BLOCK_CODE": q.BLOCK_CODE,
+				"DATE_TIME": q.DATE_TIME,
+				"CLASS_BLOCK": q.CLASS_BLOCK
+			} );
+		} );
+		res.json( {
+			message: "OK",
+			data: results
+		} )
+	};
