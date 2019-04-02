@@ -22,7 +22,6 @@
 |--------------------------------------------------------------------------
 */
 	global._directory_base = __dirname;
-	global._directory_root = '';
 
 /*
 |--------------------------------------------------------------------------
@@ -53,8 +52,11 @@
 
 	// Routing
 	app.get( '/', ( req, res ) => {
-		res.json( { 'message': config.app.name } )
+		res.json( { 
+			'message': config.app.name
+		} );
 	} );
 
 	require( './routes/api.js' )( app );
+	
 	module.exports = app;

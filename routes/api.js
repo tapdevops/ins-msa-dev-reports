@@ -17,7 +17,6 @@
 	const Controllers = {
 		V1: {
 			ClassBlockController: require( _directory_base + '/app/Http/Controllers/V1/ClassBlockController.js' ),
-			ClassBlockOpbalController: require( _directory_base + '/app/Http/Controllers/V1/ClassBlockOpbalController.js' ),
 			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' )
 		}
 	}
@@ -35,18 +34,11 @@
 | 		accept-version: 1.0.0
 |
 */
+	
 	module.exports = ( app ) => {
-
+		
 		app.post( '/api/report/class-block', routes_versioning( {
 			"1.0.0": Controllers.V1.ClassBlockController.create_or_update_v_1_0
-		} ) );
-
-		app.get( '/api/report/class-block-opbal', routes_versioning( {
-			"1.0.0": Controllers.V1.ClassBlockOpbalController.find
-		} ) );
-
-		app.post( '/api/report/class-block-opbal', routes_versioning( {
-			"1.0.0": Controllers.V1.ClassBlockOpbalController.create_or_update_v_1_0
 		} ) );
 		
 		app.get( '/api/report/inspection-baris/:location/:start_date/:end_date', routes_versioning( {
