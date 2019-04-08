@@ -9,7 +9,7 @@
 			ssl: false
 		},
 		development: {
-			url: 'mongodb://dbapp:dbapp123@149.129.252.112:27017/s_report?authSource=admin',
+			url: 'mongodb://s_report:s_report@dbappdev.tap-agri.com:4848/s_report?authSource=s_report',
 			ssl: false
 		}
 	}

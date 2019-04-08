@@ -12,6 +12,9 @@
 	// Variable
 	const config = require( _directory_base + '/config/app.js' );
 
+	// Middleware
+	const Date = require( _directory_base + '/app/Http/Middleware/Date.js' );
+
 /*
 |--------------------------------------------------------------------------
 | Module Exports
@@ -61,9 +64,7 @@
 		}
 		// Insert Data baru
 		else {
-			body.INSERT_TIME = req.body.INSERT_TIME;
-			body.UPDATE_TIME = req.body.UPDATE_TIME;
-			body.DELETE_TIME = req.body.DELETE_TIME;
+			body.INSERT_TIME = Date.convert( 'now', 'YYYYMMDDHHmmss' );
 			var set = new ClassBlockSchema( body );
 			set.save()
 			.then( data => {
@@ -88,3 +89,35 @@
 			} );
 		}
 	}
+
+	exports.find_by_periode_v_1_0 = async ( req, res ) => {
+		var query = await ClassBlockSchema.aggregate( [
+			{
+				$project: {
+					_id: 0,
+					__v: 0,
+					INSERT_TIME: 0
+				}
+			},
+			{
+				$match: {
+					WERKS: req.params.werks,
+					DATE_TIME: Number( req.params.date )
+				}
+			},
+			{
+				$sort: {
+					WERKS: 1,
+					AFD_CODE: 1,
+					BLOCK_CODE: 1,
+					PERIODE: -1
+				}
+			}
+		] );
+		
+		res.json( {
+			status: true,
+			message: "Success!",
+			data: query
+		} );
+	};
