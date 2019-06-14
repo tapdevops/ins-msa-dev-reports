@@ -169,9 +169,9 @@
 
 	exports.find_valid_v_1_0 = async ( req, res ) => {
 		
-		if ( req.params.start_date && req.params.end_date && req.params.location ) {
+		if ( req.params.periode && req.params.location ) {
 
-			var periode = parseInt( req.params.start_date.substr( 0,6 ) );
+			var periode = parseInt( req.params.periode.substr( 0,6 ) );
 			var data_inspeksi = [];
 			var done_push = 0;
 			var interval = 10000;
@@ -184,7 +184,6 @@
 						"$group": {
 							"_id": {
 								"WERKS_AFD_BLOCK_CODE": "$WERKS_AFD_BLOCK_CODE",
-								"AREAL": "$AREAL",
 								"PERIODE": "$PERIODE"
 							},
 							"COUNT": {
@@ -205,7 +204,6 @@
 						"$project": {
 							"_id": 0,
 							"WERKS_AFD_BLOCK_CODE": "$_id.WERKS_AFD_BLOCK_CODE",
-							"AREAL": "$_id.AREAL",
 							"PERIODE": "$_id.PERIODE",
 							"COUNT": "$COUNT"
 						}
@@ -224,12 +222,7 @@
 				query_get_valid_inspeksi.forEach( async function( q ) {
 					var query = await InspectionBarisSchema.find( {
 							WERKS_AFD_BLOCK_CODE: q.WERKS_AFD_BLOCK_CODE,
-							AREAL: q.AREAL,
-							PERIODE: q.PERIODE,
-							INSPECTION_DATE: {
-								$gte: parseInt( req.params.start_date ),
-								$lte: parseInt( req.params.end_date )
-							}
+							PERIODE: q.PERIODE
 						} )
 						.select( {
 							_id: 0, 
@@ -255,7 +248,7 @@
 			var count = 0;
 			var intervalObject = setInterval( function () { 
 				count++; 
-				console.log(count, 'seconds passed'); 
+				console.log(done_push, ' data passed'); 
 				if ( done_push == query_get_valid_inspeksi.length ) { 
 					clearInterval( intervalObject); 
 					setTimeout( function () {
