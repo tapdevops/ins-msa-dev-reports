@@ -49,6 +49,10 @@
 			"1.0.0": Controllers.V1.InspectionBarisController.find_v_1_0
 		} ) );
 
+		app.get( '/api/report/inspection-baris-valid/:location/:start_date/:end_date', routes_versioning( {
+			"1.0.0": Controllers.V1.InspectionBarisController.find_valid_v_1_0
+		} ) );
+
 		app.post( '/api/report/inspection-baris', routes_versioning( {
 			"1.0.0": Controllers.V1.InspectionBarisController.create_or_update_v_1_0
 		} ) );

@@ -135,14 +135,7 @@
 	
 
 	exports.find_v_1_0 = async ( req, res ) => {
-		var query = await InspectionBarisSchema.find();
-		res.json( {
-			status: true,
-			message: 'Success!',
-			data: query
-		} );
-
-		/*
+		
 		if ( req.params.start_date && req.params.end_date && req.params.location ) {
 			var location = req.params.location
 			if ( location.substr( 0, 1) == '0' )  {
@@ -152,10 +145,10 @@
 			var query = await InspectionBarisSchema.find({
 					WERKS_AFD_BLOCK_CODE: new RegExp( '^' + location ),
 					INSPECTION_DATE: {
-						$gte: req.params.start_date,
-						$lte: req.params.end_date
+						$gte: parseInt( req.params.start_date ),
+						$lte: parseInt( req.params.end_date )
 					}
-				})
+				} )
 				.select( {
 					_id: 0, 
 					__v: 0 
@@ -172,5 +165,107 @@
 				data: query
 			} );
 		}
-		*/
+	}
+
+	exports.find_valid_v_1_0 = async ( req, res ) => {
+		
+		if ( req.params.start_date && req.params.end_date && req.params.location ) {
+
+			var periode = parseInt( req.params.start_date.substr( 0,6 ) );
+			var data_inspeksi = [];
+			var done_push = 0;
+			var interval = 10000;
+			var location = req.params.location
+			if ( location.substr( 0, 1) == '0' )  {
+				location = req.params.location.substr( 1, 10 );
+			}
+			var query_get_valid_inspeksi = await InspectionBarisSchema.aggregate([
+					{
+						"$group": {
+							"_id": {
+								"WERKS_AFD_BLOCK_CODE": "$WERKS_AFD_BLOCK_CODE",
+								"AREAL": "$AREAL",
+								"PERIODE": "$PERIODE"
+							},
+							"COUNT": {
+								"$sum": 1
+							}
+						}
+					},
+					{
+						"$match": {
+							"COUNT": {
+								"$gte": 2
+							},
+							"_id.WERKS_AFD_BLOCK_CODE": new RegExp( '^' + location ),
+							"_id.PERIODE": periode
+						}
+					},
+					{
+						"$project": {
+							"_id": 0,
+							"WERKS_AFD_BLOCK_CODE": "$_id.WERKS_AFD_BLOCK_CODE",
+							"AREAL": "$_id.AREAL",
+							"PERIODE": "$_id.PERIODE",
+							"COUNT": "$COUNT"
+						}
+					},
+					{
+						"$sort": {
+							"_id.PERIODE": 1,
+							"_id.WERKS_AFD_BLOCK_CODE": -1,
+							"_id.COUNT": -1
+						}
+					}
+				] );
+			
+			var z = 1;
+			if ( query_get_valid_inspeksi.length > 0 ) {
+				query_get_valid_inspeksi.forEach( async function( q ) {
+					var query = await InspectionBarisSchema.find( {
+							WERKS_AFD_BLOCK_CODE: q.WERKS_AFD_BLOCK_CODE,
+							AREAL: q.AREAL,
+							PERIODE: q.PERIODE,
+							INSPECTION_DATE: {
+								$gte: parseInt( req.params.start_date ),
+								$lte: parseInt( req.params.end_date )
+							}
+						} )
+						.select( {
+							_id: 0, 
+							__v: 0 
+						} ).sort( {
+							WERKS: 1,
+							AFD_CODE: 1,
+							BLOCK_CODE: 1,
+							INSPECTION_DATE: 1
+						} );
+					if ( query.length > 0 ) {
+						query.forEach( function( dt ) {
+							if ( data_inspeksi.push( dt ) ) {
+								done_push = z;
+								console.log( done_push + ' / ' + z );
+							}
+						} );
+					}
+					z++;
+				} );
+			}
+			
+			var count = 0;
+			var intervalObject = setInterval( function () { 
+				count++; 
+				console.log(count, 'seconds passed'); 
+				if ( done_push == query_get_valid_inspeksi.length ) { 
+					clearInterval( intervalObject); 
+					setTimeout( function () {
+						res.status( 200 ).json( {
+							status: true,
+							message: 'Success!',
+							data: data_inspeksi
+						} );
+					}, 1000 );
+				} 
+			}, 1000 );
+		}
 	}
