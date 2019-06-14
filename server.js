@@ -53,7 +53,8 @@
 	// Routing
 	app.get( '/', ( req, res ) => {
 		res.json( { 
-			'message': config.app.name
+			'app_name': config.app.name,
+			'env': config.app.env
 		} );
 	} );
 
