@@ -35,6 +35,7 @@
 				LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
 				LONG_START_INSPECTION: req.body.LAT_START_INSPECTION,
 				INSPECTION_DATE: req.body.INSPECTION_DATE,
+				INSPECTION_TIME: req.body.INSPECTION_TIME,
 				AREAL: req.body.AREAL,
 				LAMA_INSPEKSI: req.body.LAMA_INSPEKSI,
 				SPMON: req.body.SPMON,
@@ -91,6 +92,7 @@
 				LAT_START_INSPECTION: req.body.LAT_START_INSPECTION,
 				LONG_START_INSPECTION: req.body.LAT_START_INSPECTION,
 				INSPECTION_DATE: req.body.INSPECTION_DATE,
+				INSPECTION_TIME: req.body.INSPECTION_TIME,
 				AREAL: req.body.AREAL,
 				LAMA_INSPEKSI: req.body.LAMA_INSPEKSI,
 				SPMON: req.body.SPMON,
@@ -135,25 +137,17 @@
 	
 
 	exports.find_v_1_0 = async ( req, res ) => {
-		console.log("AWWW");
 		if ( req.params.start_date && req.params.end_date && req.params.location ) {
 			var location = req.params.location
 			if ( location.substr( 0, 1) == '0' )  {
 				location = req.params.location.substr( 1, 10 );
 			}
 
-			console.log(req.params);
-			console.log( {WERKS_AFD_BLOCK_CODE: new RegExp( '^' + location ),
-					INSPECTION_DATE: {
-						$gte: parseInt( req.params.start_date + '000000' ),
-						$lte: parseInt( req.params.end_date + '235959' )
-					}
-				} );
 			var query = await InspectionBarisSchema.find( {
 					WERKS_AFD_BLOCK_CODE: new RegExp( '^' + location ),
 					INSPECTION_DATE: {
-						$gte: parseInt( req.params.start_date + '000000' ),
-						$lte: parseInt( req.params.end_date + '235959' )
+						$gte: parseInt( req.params.start_date ),
+						$lte: parseInt( req.params.end_date )
 					}
 				} )
 				.select( {
@@ -166,8 +160,9 @@
 					INSPECTION_DATE: 1
 				} );
 
-			console.log(query);
-			res.json( {
+				console.log(query);
+
+			return res.status( 200 ).json( {
 				status: true,
 				message: 'Success!',
 				data: query
@@ -176,7 +171,38 @@
 	}
 
 	exports.find_valid_v_1_0 = async ( req, res ) => {
+
+		if ( req.params.periode && req.params.location ) {
+			var periode = parseInt( req.params.periode.substr( 0,6 ) );
+			var query = await InspectionBarisSchema.find( {
+				WERKS_AFD_BLOCK_CODE: new RegExp( '^' + req.params.location ),
+				PERIODE: periode
+			} ).select( {
+				_id: 0, 
+				__v: 0 
+			} ).sort( {
+				WERKS: 1,
+				AFD_CODE: 1,
+				BLOCK_CODE: 1,
+				INSPECTION_DATE: 1
+			} );
+
+			res.status( 200 ).json( {
+				status: true,
+				message: 'Success!',
+				data: query
+			} );
+		}
+		else {
+			res.status( 200 ).json( {
+				status: false,
+				message: 'Parameter Input tidak sesuai.',
+				data: []
+			} );
+		}
 		
+		/*
+
 		if ( req.params.periode && req.params.location ) {
 
 			var periode = parseInt( req.params.periode.substr( 0,6 ) );
@@ -245,7 +271,6 @@
 						query.forEach( function( dt ) {
 							if ( data_inspeksi.push( dt ) ) {
 								done_push = z;
-								console.log( done_push + ' / ' + z );
 							}
 						} );
 					}
@@ -267,6 +292,7 @@
 						} );
 					}, 1000 );
 				} 
-			}, 1000 );
+			}, 250 );
 		}
+		*/
 	}
