@@ -10,9 +10,6 @@
 	const jwtDecode = require( 'jwt-decode' );
 	const routes_versioning = require( 'express-routes-versioning' )();
 
-	// Config Variable
-	const config = require( _directory_base + '/config/app.js' );
-
 	// Controllers Variable
 	const Controllers = {
 		V1: {
@@ -36,6 +33,21 @@
 */
 	
 	module.exports = ( app ) => {
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Welcome Message
+		 |--------------------------------------------------------------------------
+		 */
+			app.get( '/', ( req, res ) => {
+				res.json( { 
+					application: {
+						name : config.app.name,
+						port : config.app.port[config.app.env],
+						environment : config.app.env
+					} 
+				} )
+			} );
 		
 		app.post( '/api/report/class-block', routes_versioning( {
 			"1.0.0": Controllers.V1.ClassBlockController.create_or_update_v_1_0

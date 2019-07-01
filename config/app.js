@@ -5,18 +5,22 @@ module.exports = {
 	| App Config
 	|--------------------------------------------------------------------------
 	*/
-	port: process.env.PORT || 4013,
-	name: 'Microservice Report',
-	env: 'development', // production, qa, development
+		name: 'Microservice Hectare Statement',
+		env: 'dev', // prod, qa, dev
+		port: {
+			dev: process.env.PORT || 4013,
+			qa: process.env.PORT || 5013,
+			prod: process.env.PORT || 3013,
+		},
 
 	/*
 	|--------------------------------------------------------------------------
 	| Token
 	|--------------------------------------------------------------------------
 	*/
-	secret_key: 'T4pagri123#',
-	token_expiration: 7, // Days
-	token_algorithm: 'HS256',
+		secret_key: 'T4pagri123#',
+		token_expiration: 7, // Days
+		token_algorithm: 'HS256',
 
 	/*
 	|--------------------------------------------------------------------------
