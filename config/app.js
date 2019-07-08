@@ -6,7 +6,7 @@ module.exports = {
 	|--------------------------------------------------------------------------
 	*/
 		name: 'Microservice Hectare Statement',
-		env: 'prod', // prod, qa, dev
+		env: 'dev', // prod, qa, dev
 		port: {
 			dev: process.env.PORT || 4013,
 			qa: process.env.PORT || 5013,
