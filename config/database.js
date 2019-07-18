@@ -9,7 +9,7 @@
 			ssl: false
 		},
 		qa: {
-			url: 'mongodb://s_report:s_report@dbappdev.tap-agri.com:4848/s_report?authSource=s_report',
+			url: 'mongodb://s_report:r3p0rt2019@dbappqa.tap-agri.com:4848/s_report?authSource=s_report',
 			ssl: false
 		},
 		prod: {
