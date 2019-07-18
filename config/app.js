@@ -10,7 +10,7 @@ module.exports = {
 		port: {
 			dev: process.env.PORT || 4013,
 			qa: process.env.PORT || 5013,
-			prod: process.env.PORT || 3013,
+			prod: process.env.PORT || 3013
 		},
 
 	/*
