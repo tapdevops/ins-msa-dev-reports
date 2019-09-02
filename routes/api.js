@@ -14,7 +14,9 @@
 	const Controllers = {
 		V1: {
 			ClassBlockController: require( _directory_base + '/app/Http/Controllers/V1/ClassBlockController.js' ),
-			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' )
+			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' ),
+			KafkaRequestController: require( _directory_base + '/app/Http/Controllers/V1/KafkaRequestController.js' )
+
 		}
 	}
 
@@ -68,6 +70,10 @@
 		app.post( '/api/report/inspection-baris', routes_versioning( {
 			"1.0.0": Controllers.V1.InspectionBarisController.create_or_update_v_1_0
 		} ) );
+		app.post( '/api/report/request-report', routes_versioning( {
+			"1.0.0": Controllers.V1.KafkaRequestController.request_data
+		} ) );
+		
 
 	}
 

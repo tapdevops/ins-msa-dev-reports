@@ -20,7 +20,39 @@
 
 	// Primary Variable
 	const app = express();
-
+	var data_source_request = {
+		"auth": false,
+		"finding": false,
+	}
+	var kafka = require( "kafka-node" ),
+	Producer = kafka.Producer,
+	Consumer = kafka.Consumer,
+	client = new kafka.KafkaClient( { kafkaHost: "149.129.252.13:9092" } ),
+	producer = new Producer( client ),
+	consumer = new Consumer(
+		client,
+		[
+			{ topic: 'kafkaRequestData', partition: 0 }, { topic: 'kafkaDataCollectionProgress', partition: 0 }, { topic: 'kafkaResponse', partition: 0 }
+		],
+		{
+			autoCommit: false
+		}
+	);
+	consumer.on( 'message', function( message ) {
+		json_message = JSON.parse( message.value );
+		if( message.topic == "kafkaRequestData" ){
+			let reqDataObj;
+			let responseData = false;
+			if( json_message.msa_name == "finding" ) {
+				reqDataObj = {
+					"msa_name": json_message.msa_name,
+					"model_name": json_message.model_name,
+					"requester": json_message.requester,
+					"request_id": json_message.request_id,
+				}
+			}
+		}
+	} )
 /*
 |--------------------------------------------------------------------------
 | APP Init
