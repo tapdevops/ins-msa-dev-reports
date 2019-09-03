@@ -1,5 +1,6 @@
 var kafka = require("kafka-node")
 exports.request_data = async( req, res ) => {
+	
 	Producer = kafka.Producer,
 	Consumer = kafka.Consumer,
 	client = new kafka.KafkaClient({kafkaHost : "149.129.252.13:9092"}),
@@ -16,18 +17,20 @@ exports.request_data = async( req, res ) => {
 	producer.on("ready", function() {
 		const requestObject = req.body.requestObject;
 		console.log( requestObject )
+		// console.log( requestObject )
         
 			payloads = [
-				{ topic: "kafkaRequest", messages: JSON.stringify(requestObject), partition: 0 }
+				{ topic: "kafkaRequest", messages: JSON.stringify(requestObject[0]), partition: 0 }
 			];
 
 			producer.send( payloads, function( err, data ) {
 				console.log( "Send to kafka request data" );
 			});
-		//}, 2000);
+		// }, 2000);
 	});
 
 	producer.on("error", function(err) {
 		console.log(err);
 	});
+		
 }
