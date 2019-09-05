@@ -8,6 +8,9 @@
 		config.app = require( './config/app.js' );
 		config.database = require( './config/database.js' )[config.app.env];
 
+	//Models
+	const Datasource = require( _directory_base + '/app/Http/Models/V1/DatasourceModel.js' )
+
 /*
 |--------------------------------------------------------------------------
 | APP Setup
@@ -39,12 +42,13 @@
 		}
 	);
 	consumer.on( 'message', function( message ) {
-		console.log( "MESSAGE: ",message );
+		// console.log( "MESSAGE: ",message.topic );
 		json_message = JSON.parse( message.value );
-		console.log( json_message );
-		if(message.topic == "kafkaDataCollectionProgress"){
-			if(json_message.requester=="web"&&json_message.request_id==2){
+		// console.log( json_message );
+		if(message.topic == "kafkaDataCollectionProgress"){ 
+			if(json_message.requester=="web"){//&&json_message.request_id==2
 				//update progress data collection
+				// console.log( "JSON_MESSAGE", json_message );
 				let data_complete = true;
 				data_source_request[json_message.msa_name] = true;
 				for(let x in data_source_request){
@@ -52,9 +56,31 @@
 						data_complete = false;
 					}
 				}
+				console.log( 
+					Datasource.find( {
+
+					} )	
+				);
+				Datasource.findOneAndUpdate( 
+					{
+						MSA_NAME: json_message.msa_name,
+						MODEL_NAME: json_message.model_name,
+						REQUESTER: json_message.requester,
+						IS_DONE : 0	
+					}, 
+					{
+						"$set":{
+							IS_DONE: 1
+						}
+					},
+					{ 
+						new: true 
+					} 
+				);
+				return false;
 				if(data_complete){
 					var SSH = require('simple-ssh');
-	
+					
 					var ssh = new SSH({
 						host: '149.129.252.13',
 						user: 'root',
@@ -66,10 +92,11 @@
 							console.log(stdout);
 						}
 					}).start();
+					
 				}
 			}	
 		}else if(message.topic=="kafkaResponse"){
-			console.log(message,json_message);
+			// console.log(message,json_message);
 			var SSH = require('simple-ssh');
 			var ssh = new SSH({
 				host: '149.129.252.13',
@@ -82,6 +109,7 @@
 					console.log(stdout);
 				}
 			}).start();
+			console.log( "STREAM RESTARTED" );
 		}
 	} );
 	// consumer.on( 'message', function( message ) {
