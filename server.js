@@ -56,16 +56,12 @@
 						data_complete = false;
 					}
 				}
-				console.log( 
-					Datasource.find( {
-
-					} )	
-				);
 				Datasource.findOneAndUpdate( 
 					{
 						MSA_NAME: json_message.msa_name,
 						MODEL_NAME: json_message.model_name,
 						REQUESTER: json_message.requester,
+						REQUEST_ID: json_message.request_id,
 						IS_DONE : 0	
 					}, 
 					{
@@ -77,39 +73,30 @@
 						new: true 
 					} 
 				);
+				Datasource.find({
+					REQUESTER: json_message.requester,
+					IS_DONE : 0	
+				}).toArray(function(err, docs) {
+					if(docs.length>0){
+						var SSH = require('simple-ssh');
+					
+						var ssh = new SSH({
+							host: '149.129.252.13',
+							user: 'root',
+							pass: 'T4pagri123'
+						});
+						//buat switch app dari stream(yang lagi jalan) ke data processor
+						ssh.exec("nohup /root/spark/bin/spark-submit /root/pyspark/code/collecting.py requester="+json_message.requester+"/request_id="+json_message.request_id+" > /root/pyspark/output/collectorlog.txt &", {
+							out: function(stdout) {
+								console.log(stdout);
+							}
+						}).start();
+					}
+				});
 				return false;
-				if(data_complete){
-					var SSH = require('simple-ssh');
-					
-					var ssh = new SSH({
-						host: '149.129.252.13',
-						user: 'root',
-						pass: 'T4pagri123'
-					});
-					//buat switch app dari stream(yang lagi jalan) ke data processor
-					ssh.exec("nohup /root/pyspark/script/switchapp.sh -r='requester=web/request_id=2' &", {
-						out: function(stdout) {
-							console.log(stdout);
-						}
-					}).start();
-					
-				}
 			}	
 		}else if(message.topic=="kafkaResponse"){
-			// console.log(message,json_message);
-			var SSH = require('simple-ssh');
-			var ssh = new SSH({
-				host: '149.129.252.13',
-				user: 'root',
-				pass: 'T4pagri123'
-			});
-			//buat nyalain ulang streamnya
-			ssh.exec("nohup /root/spark/bin/spark-submit /root/pyspark/code/stream.py > /root/pyspark/output/streamlog.txt &", {
-				out: function(stdout) {
-					console.log(stdout);
-				}
-			}).start();
-			console.log( "STREAM RESTARTED" );
+			console.log(message,json_message);
 		}
 	} );
 	// consumer.on( 'message', function( message ) {

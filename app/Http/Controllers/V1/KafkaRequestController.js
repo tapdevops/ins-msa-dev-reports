@@ -39,6 +39,7 @@
 					"MSA_NAME": requestObject[0].data_source[i].msa_name,
 					"MODEL_NAME": requestObject[0].data_source[i].model_name,
 					"REQUESTER": requestObject[0].requester,
+					"REQUEST_ID": json_message.request_id,
 					"IS_DONE": 0
 				} );
 				// console.log( set );
