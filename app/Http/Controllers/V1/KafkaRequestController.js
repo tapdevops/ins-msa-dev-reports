@@ -39,7 +39,6 @@
 					"MSA_NAME": requestObject[0].data_source[i].msa_name,
 					"MODEL_NAME": requestObject[0].data_source[i].model_name,
 					"REQUESTER": requestObject[0].requester,
-					"REQUEST_ID": json_message.request_id,
 					"IS_DONE": 0
 				} );
 				// console.log( set );
@@ -53,18 +52,25 @@
 				}
 			] );
 			
-				payloads = [
-					{ topic: "kafkaRequest", messages: JSON.stringify(requestObject[0]), partition: 0 }
-				];
+			payloads = [
+				{ topic: "kafkaRequest", messages: JSON.stringify(requestObject[0]), partition: 0 }
+			];
 
-				producer.send( payloads, function( err, data ) {
-					console.log( "Send to kafka request data" );
-				});
+			console.log("PAYLOADS:");
+				console.log(payloads);
+
+			producer.send( payloads, function( err, data ) {
+				console.log( "Send to kafka request data" );
+			});
 			// }, 2000);
 		});
 
 		producer.on("error", function(err) {
 			console.log(err);
 		});
+
+		return res.json({
+			message: "Gani"
+		})
 			
 	}
