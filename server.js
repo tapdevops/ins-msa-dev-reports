@@ -9,7 +9,8 @@
 		config.database = require( './config/database.js' )[config.app.env];
 
 	//Models
-	const Datasource = require( _directory_base + '/app/Http/Models/V1/DatasourceModel.js' )
+	const Datasource = require( _directory_base + '/app/Http/Models/V1/DatasourceModel.js' );
+	const Dataresult = require( _directory_base + '/app/Http/Models/V1/DataresultModel.js' );
 
 /*
 |--------------------------------------------------------------------------
@@ -41,13 +42,18 @@
 			autoCommit: false
 		}
 	);
+<<<<<<< HEAD
 	consumer.on( 'message', function( message ) {
 
 		console.log(message);
+=======
+	consumer.on( 'message', async function( message ) {
+>>>>>>> 16a6578afe69456c8ca07264b61a8b656dcd21f9
 		// console.log( "MESSAGE: ",message.topic );
-		json_message = JSON.parse( message.value );
+		let json_message = JSON.parse( message.value );
 		// console.log( json_message );
 		if(message.topic == "kafkaDataCollectionProgress"){ 
+<<<<<<< HEAD
 			console.log( 'KAFKA DATA COLLECTION PROGRESS' );
 			if(json_message.requester=="web"){
 
@@ -91,23 +97,48 @@
 				// return false;
 				if(data_complete){
 					console.log( 'Return SSH' );
+=======
+			if(json_message.requester=="web"){
+				await Datasource.findOneAndUpdate( 
+					{
+						MSA_NAME: json_message.msa_name,
+						MODEL_NAME: json_message.model_name,
+						REQUESTER: json_message.requester,
+						REQUEST_ID: json_message.request_id,
+						IS_DONE : 0	
+					}, 
+					{
+						IS_DONE: 1
+					} 
+				);
+				let docs = await Datasource.find({
+					REQUESTER: json_message.requester,
+					REQUEST_ID: json_message.request_id,
+					IS_DONE : 0	
+				});
+				if(docs.length==0){
+>>>>>>> 16a6578afe69456c8ca07264b61a8b656dcd21f9
 					var SSH = require('simple-ssh');
-					
+				
 					var ssh = new SSH({
 						host: '149.129.252.13',
 						user: 'root',
 						pass: 'T4pagri123'
 					});
 					//buat switch app dari stream(yang lagi jalan) ke data processor
+<<<<<<< HEAD
 					ssh.exec("nohup /root/pyspark/script/switchapp.sh -r='requester=web/request_id=1' &", {
+=======
+					ssh.exec("nohup /root/spark/bin/spark-submit /root/pyspark/code/collecting.py requester="+json_message.requester+"/request_id="+json_message.request_id+" > /root/pyspark/output/collectorlog.txt &", {
+>>>>>>> 16a6578afe69456c8ca07264b61a8b656dcd21f9
 						out: function(stdout) {
 							console.log(stdout);
 						}
 					}).start();
-					
 				}
 			}	
 		}else if(message.topic=="kafkaResponse"){
+<<<<<<< HEAD
 			console.log('KAFKA RESPONSE');
 			// console.log(message,json_message);
 			var SSH = require('simple-ssh');
@@ -123,6 +154,14 @@
 				}
 			}).start();
 			console.log( "STREAM RESTARTED" );
+=======
+			const set = new Dataresult( {
+				REQUESTER: json_message.requester,
+				REQUEST_ID: json_message.request_id,
+				"DATA": json_message.data
+			} );
+			set.save();
+>>>>>>> 16a6578afe69456c8ca07264b61a8b656dcd21f9
 		}
 	} );
 
