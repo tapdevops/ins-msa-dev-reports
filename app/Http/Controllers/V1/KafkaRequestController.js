@@ -65,24 +65,23 @@
 		producer.on("error", function(err) {
 			console.log(err);
 		});
-		return res.json({
-			data: await checkResult(requestObject[0].requester,requestObject[0].request_id)
-		});
+		return await checkResult(requestObject[0].requester,requestObject[0].request_id,res);
 	}
 	
-	async function checkResult(requester,request_id){
+	async function checkResult(requester,request_id,res){
 		let result = await Dataresult.find({
 			REQUESTER: requester,
 			REQUEST_ID: request_id
 		})
-		console.log("Dataresult",{
-			REQUESTER: requester,
-			REQUEST_ID: request_id
-		},result);
 		if(result.length>0){
-			return JSON.parse(result[0].DATA);
+			console.log(JSON.parse("["+result[0].DATA+"]"));
+			return res.json({
+				REQUESTER : result[0].REQUESTER,
+				REQUEST_ID : result[0].REQUEST_ID,
+				DATA : JSON.parse("["+result[0].DATA+"]")
+			});
 		}
 		else{
-			setTimeout(checkResult,5000,requester,request_id);
+			setTimeout(checkResult,5000,requester,request_id,res);
 		}
 	}

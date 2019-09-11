@@ -42,21 +42,12 @@
 			autoCommit: false
 		}
 	);
-	consumer.on( 'message', function( message ) {
+	consumer.on( 'message', async function( message ) {
 		// console.log( "MESSAGE: ",message.topic );
 		let json_message = JSON.parse( message.value );
 		// console.log( json_message );
 		if(message.topic == "kafkaDataCollectionProgress"){ 
-			if(json_message.requester=="web"){//&&json_message.request_id==2
-				//update progress data collection
-				// console.log( "JSON_MESSAGE", json_message );
-				let data_complete = true;
-				data_source_request[json_message.msa_name] = true;
-				for(let x in data_source_request){
-					if(data_source_request[x]==false){
-						data_complete = false;
-					}
-				}
+			if(json_message.requester=="web"){
 				await Datasource.findOneAndUpdate( 
 					{
 						MSA_NAME: json_message.msa_name,
@@ -69,7 +60,7 @@
 						IS_DONE: 1
 					} 
 				);
-				let docs = Datasource.find({
+				let docs = await Datasource.find({
 					REQUESTER: json_message.requester,
 					REQUEST_ID: json_message.request_id,
 					IS_DONE : 0	
@@ -89,8 +80,6 @@
 						}
 					}).start();
 				}
-				});
-				return false;
 			}	
 		}else if(message.topic=="kafkaResponse"){
 			const set = new Dataresult( {
