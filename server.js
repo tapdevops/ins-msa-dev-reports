@@ -22,7 +22,7 @@
 	const mongoose = require( 'mongoose' );
 
 	// Primary Variable
-	const app = express();
+	const App = express();
 	var data_source_request = {
 		"auth": false,
 		"finding": false,
@@ -42,11 +42,17 @@
 		}
 	);
 	consumer.on( 'message', function( message ) {
+
+		console.log(message);
 		// console.log( "MESSAGE: ",message.topic );
 		json_message = JSON.parse( message.value );
 		// console.log( json_message );
 		if(message.topic == "kafkaDataCollectionProgress"){ 
-			if(json_message.requester=="web"){//&&json_message.request_id==2
+			console.log( 'KAFKA DATA COLLECTION PROGRESS' );
+			if(json_message.requester=="web"){
+
+				console.log('xxxxx web');
+				//&&json_message.request_id==2
 				//update progress data collection
 				// console.log( "JSON_MESSAGE", json_message );
 				let data_complete = true;
@@ -56,29 +62,35 @@
 						data_complete = false;
 					}
 				}
-				console.log( 
-					Datasource.find( {
+				// console.log( 
+				// 	Datasource.find( {
 
-					} )	
-				);
-				Datasource.findOneAndUpdate( 
-					{
-						MSA_NAME: json_message.msa_name,
-						MODEL_NAME: json_message.model_name,
-						REQUESTER: json_message.requester,
-						IS_DONE : 0	
-					}, 
-					{
-						"$set":{
-							IS_DONE: 1
-						}
-					},
-					{ 
-						new: true 
-					} 
-				);
-				return false;
+				// 	} )	
+				// );
+
+				console.log({ 
+					MSA_NAME: json_message.msa_name,
+					MODEL_NAME: json_message.model_name,
+					REQUESTER: json_message.requester,
+					IS_DONE : 0	
+				});
+
+				Datasource.findOneAndUpdate( { 
+					MSA_NAME: json_message.msa_name,
+					MODEL_NAME: json_message.model_name,
+					REQUESTER: json_message.requester,
+					IS_DONE : 0	
+				}, {
+					IS_DONE: 1
+				}, { new: true } )
+				.then( x => {
+					console.log(x);
+				} );
+
+
+				// return false;
 				if(data_complete){
+					console.log( 'Return SSH' );
 					var SSH = require('simple-ssh');
 					
 					var ssh = new SSH({
@@ -87,7 +99,7 @@
 						pass: 'T4pagri123'
 					});
 					//buat switch app dari stream(yang lagi jalan) ke data processor
-					ssh.exec("nohup /root/pyspark/script/switchapp.sh -r='requester=web/request_id=2' &", {
+					ssh.exec("nohup /root/pyspark/script/switchapp.sh -r='requester=web/request_id=1' &", {
 						out: function(stdout) {
 							console.log(stdout);
 						}
@@ -96,6 +108,7 @@
 				}
 			}	
 		}else if(message.topic=="kafkaResponse"){
+			console.log('KAFKA RESPONSE');
 			// console.log(message,json_message);
 			var SSH = require('simple-ssh');
 			var ssh = new SSH({
@@ -112,6 +125,7 @@
 			console.log( "STREAM RESTARTED" );
 		}
 	} );
+
 	// consumer.on( 'message', function( message ) {
 	// 	json_message = JSON.parse( message.value );
 	// 	if( message.topic == "kafkaRequestData" ){
@@ -133,10 +147,10 @@
 |--------------------------------------------------------------------------
 */
 	// Parse request of content-type - application/x-www-form-urlencoded
-	app.use( body_parser.urlencoded( { extended: false } ) );
+	App.use( body_parser.urlencoded( { extended: false } ) );
 
 	// Parse request of content-type - application/json
-	app.use( body_parser.json() );
+	App.use( body_parser.json() );
 
 	// Setup Database
 	mongoose.Promise = global.Promise;
@@ -154,13 +168,11 @@
 	} );
 
 	// Server Running Message
-	app.listen( parseInt( config.app.port[config.app.env] ), () => {
-		console.log( "Server :" );
-		console.log( "\tStatus \t\t: OK" );
-		console.log( "\tService \t: " + config.app.name + " (" + config.app.env + ")" );
-		console.log( "\tPort \t\t: " + config.app.port[config.app.env] );
+	var Server = App.listen( parseInt( config.app.port[config.app.env] ), () => {
+		Server.timeout = 120 * 60 * 1000;
+		console.log( "Server connected at " + parseInt( config.app.port[config.app.env] ) + " (" + config.app.env + ")" );
 	} );
 
 	// Routing
-	require( './routes/api.js' )( app );
-	module.exports = app;
+	require( './routes/api.js' )( App );
+	module.exports = App;

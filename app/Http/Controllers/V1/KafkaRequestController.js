@@ -52,18 +52,25 @@
 				}
 			] );
 			
-				payloads = [
-					{ topic: "kafkaRequest", messages: JSON.stringify(requestObject[0]), partition: 0 }
-				];
+			payloads = [
+				{ topic: "kafkaRequest", messages: JSON.stringify(requestObject[0]), partition: 0 }
+			];
 
-				producer.send( payloads, function( err, data ) {
-					console.log( "Send to kafka request data" );
-				});
+			console.log("PAYLOADS:");
+				console.log(payloads);
+
+			producer.send( payloads, function( err, data ) {
+				console.log( "Send to kafka request data" );
+			});
 			// }, 2000);
 		});
 
 		producer.on("error", function(err) {
 			console.log(err);
 		});
+
+		return res.json({
+			message: "Gani"
+		})
 			
 	}

@@ -74,7 +74,6 @@
 			"1.0.0": Controllers.V1.KafkaRequestController.request_data
 		} ) );
 		
-
 	}
 
 /*

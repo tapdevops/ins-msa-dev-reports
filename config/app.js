@@ -5,7 +5,7 @@ module.exports = {
 	| App Config
 	|--------------------------------------------------------------------------
 	*/
-		name: 'Microservice Hectare Statement',
+		name: 'Microservice Report',
 		env: 'dev', // prod, qa, dev
 		port: {
 			dev: process.env.PORT || 4013,
