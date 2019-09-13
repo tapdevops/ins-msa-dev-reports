@@ -12,6 +12,11 @@
 
 	// Controllers Variable
 	const Controllers = {
+		v_1_0: {
+			KafkaRequestController: require( _directory_base + '/app/v1.0/Http/Controllers/KafkaRequestController.js' ),
+			TestController: require( _directory_base + '/app/v1.0/Http/Controllers/TestController.js' ),
+
+		},
 		V1: {
 			ClassBlockController: require( _directory_base + '/app/Http/Controllers/V1/ClassBlockController.js' ),
 			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' ),
@@ -50,6 +55,28 @@
 					} 
 				} )
 			} );
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Versi 1.0
+		 |--------------------------------------------------------------------------
+		 */
+			app.get( '/test', Controllers.v_1_0.TestController.data );
+			app.post( '/api/v1.0/reports/kafka/request', Controllers.v_1_0.KafkaRequestController.request_data );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		
 		app.post( '/api/report/class-block', routes_versioning( {
 			"1.0.0": Controllers.V1.ClassBlockController.create_or_update_v_1_0

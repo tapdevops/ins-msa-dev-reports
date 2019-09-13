@@ -4,13 +4,36 @@
 |--------------------------------------------------------------------------
 */
 	global._directory_base = __dirname;
+	global._default_db = 'reports';
+	global._latest_version = 'v1.0';
 	global.config = {};
 		config.app = require( './config/app.js' );
-		config.database = require( './config/database.js' )[config.app.env];
+		config.database = require( './config/database.js' )[_default_db][config.app.env];
 
 	//Models
 	const Datasource = require( _directory_base + '/app/Http/Models/V1/DatasourceModel.js' );
 	const Dataresult = require( _directory_base + '/app/Http/Models/V1/DataresultModel.js' );
+
+	// Database Models
+	const Models = {
+		"Auth": {
+			"ViewUserAuth": require( _directory_base + '/app/' + _latest_version + '/Http/Models/Auth/ViewUserAuthModel.js' ),
+		},
+		// "Inspection": {
+		// 	"ViewInspection": require( _directory_base + '/app/' + _latest_version + '/Http/Models/Inspection/ViewInspectionModel.js' ),
+		// },
+		"Reports": {
+			"DataSource": require( _directory_base + '/app/' + _latest_version + '/Http/Models/Reports/DataSourceModel.js' ),
+			"DataResult": require( _directory_base + '/app/' + _latest_version + '/Http/Models/Reports/DataResultModel.js' ),
+		}
+	}
+
+	// Database Set
+	async function async_foreach( array, callback ) {
+		for ( let index = 0; index < array.length; index++ ) {
+			await callback( array[index], index, array );
+		}
+	}
 
 /*
 |--------------------------------------------------------------------------
@@ -18,22 +41,18 @@
 |--------------------------------------------------------------------------
 */
 	// Node Modules
-	const body_parser = require( 'body-parser' );
-	const express = require( 'express' );
-	const mongoose = require( 'mongoose' );
+	const BodyParser = require( 'body-parser' );
+	const Express = require( 'express' );
+	const App = Express();
+	const Mongoose = require( 'mongoose' );
 
 	// Primary Variable
-	const app = express();
-	var data_source_request = {
-		"auth": false,
-		"finding": false,
-	}
-	var kafka = require( "kafka-node" ),
-	Producer = kafka.Producer,
-	Consumer = kafka.Consumer,
-	client = new kafka.KafkaClient( { kafkaHost: "149.129.252.13:9092" } ),
-	producer = new Producer( client ),
-	consumer = new Consumer(
+	var kafka = require( "kafka-node" );
+	var Producer = kafka.Producer;
+	var Consumer = kafka.Consumer;
+	var client = new kafka.KafkaClient( { kafkaHost: "149.129.252.13:9092" } );
+	var producer = new Producer( client );
+	var consumer = new Consumer(
 		client,
 		[
 			{ topic: 'kafkaRequestData', partition: 0 }, { topic: 'kafkaDataCollectionProgress', partition: 0 }, { topic: 'kafkaResponse', partition: 0 }
@@ -42,13 +61,14 @@
 			autoCommit: false
 		}
 	);
+
 	consumer.on( 'message', async function( message ) {
-		// console.log( "MESSAGE: ",message.topic );
 		let json_message = JSON.parse( message.value );
-		// console.log( json_message );
-		if(message.topic == "kafkaDataCollectionProgress"){ 
-			if(json_message.requester=="web"){
-				await Datasource.findOneAndUpdate( 
+		if ( message.topic == "kafkaDataCollectionProgress" ){ 
+			console.log("kafkaDataCollectionProgress Topic");
+			if(json_message.requester == "web" ) {
+				console.log("Requester Web");
+				Datasource.findOneAndUpdate( 
 					{
 						MSA_NAME: json_message.msa_name,
 						MODEL_NAME: json_message.model_name,
@@ -59,29 +79,62 @@
 					{
 						IS_DONE: 1
 					} 
-				);
-				let docs = await Datasource.find({
-					REQUESTER: json_message.requester,
-					REQUEST_ID: json_message.request_id,
-					IS_DONE : 0	
-				});
-				if(docs.length==0){
-					var SSH = require('simple-ssh');
-				
-					var ssh = new SSH({
-						host: '149.129.252.13',
-						user: 'root',
-						pass: 'T4pagri123'
-					});
-					//buat switch app dari stream(yang lagi jalan) ke data processor
-					ssh.exec("nohup /root/spark/bin/spark-submit /root/pyspark/code/collecting.py requester="+json_message.requester+"/request_id="+json_message.request_id+" > /root/pyspark/output/collectorlog.txt &", {
-						out: function(stdout) {
-							console.log(stdout);
+				).then( update_datasource => {
+					console.log( "Run Datasource.findOneAndUpdate()" );
+					Datasource.find( {
+						REQUESTER: json_message.requester,
+						REQUEST_ID: json_message.request_id,
+						IS_DONE : 0
+					} )
+					.count()
+					.then( datasource_count => {
+						console.log( "Run Datasource.find()" );
+						if ( datasource_count == 0 ) {
+							var ssh = new SSH({
+								host: '149.129.252.13',
+								user: 'root',
+								pass: 'T4pagri123'
+							});
+							var z = 1;
+							//buat switch app dari stream(yang lagi jalan) ke data processor
+							ssh.exec("nohup /root/spark/bin/spark-submit /root/pyspark/code/collecting.py requester="+json_message.requester+"/request_id="+json_message.request_id+" > /root/pyspark/output/collectorlog.txt &", {
+								out: function(stdout) {
+									console.log(stdout);
+									console.log( "Z Run : " + z );
+									z++;
+								}
+							}).start();
 						}
-					}).start();
-				}
+					} );
+				} );
+				// let docs = await Datasource.find( {
+				// 	REQUESTER: json_message.requester,
+				// 	REQUEST_ID: json_message.request_id,
+				// 	IS_DONE : 0	
+				// } );
+
+				
+				// if ( docs.length == 0 ) {
+				// 	console.log( "ABCDE" );
+				// 	var SSH = require('simple-ssh');
+				
+				// 	var ssh = new SSH({
+				// 		host: '149.129.252.13',
+				// 		user: 'root',
+				// 		pass: 'T4pagri123'
+				// 	});
+				// 	//buat switch app dari stream(yang lagi jalan) ke data processor
+				// 	ssh.exec("nohup /root/spark/bin/spark-submit /root/pyspark/code/collecting.py requester="+json_message.requester+"/request_id="+json_message.request_id+" > /root/pyspark/output/collectorlog.txt &", {
+				// 		out: function(stdout) {
+				// 			console.log(stdout);
+				// 		}
+				// 	}).start();
+				// }
+				
 			}	
-		}else if(message.topic=="kafkaResponse"){
+		}
+		else if ( message.topic == "kafkaResponse" ) {
+			console.log( "INPUT DB FROM SPARK" );
 			const set = new Dataresult( {
 				REQUESTER: json_message.requester,
 				REQUEST_ID: json_message.request_id,
@@ -90,55 +143,43 @@
 			set.save();
 		}
 	} );
-	// consumer.on( 'message', function( message ) {
-	// 	json_message = JSON.parse( message.value );
-	// 	if( message.topic == "kafkaRequestData" ){
-	// 		let reqDataObj;
-	// 		let responseData = false;
-	// 		if( json_message.msa_name == "finding" ) {
-	// 			reqDataObj = {
-	// 				"msa_name": json_message.msa_name,
-	// 				"model_name": json_message.model_name,
-	// 				"requester": json_message.requester,
-	// 				"request_id": json_message.request_id,
-	// 			}
-	// 		}
-	// 	}
-	// } )
+
+	consumer.on( 'error', function( error, data ) {
+		console.log( error );
+	} );
+
 /*
 |--------------------------------------------------------------------------
 | APP Init
 |--------------------------------------------------------------------------
 */
 	// Parse request of content-type - application/x-www-form-urlencoded
-	app.use( body_parser.urlencoded( { extended: false } ) );
+	App.use( BodyParser.urlencoded( { extended: false } ) );
 
 	// Parse request of content-type - application/json
-	app.use( body_parser.json() );
+	App.use( BodyParser.json() );
 
 	// Setup Database
-	mongoose.Promise = global.Promise;
-	mongoose.connect( config.database.url, {
+	Mongoose.Promise = global.Promise;
+	Mongoose.connect( config.database.url, {
 		useNewUrlParser: true,
 		ssl: config.database.ssl
 	} ).then( () => {
-		console.log( "Database :" );
-		console.log( "\tStatus \t\t: Connected" );
-		console.log( "\tMongoDB URL \t: " + config.database.url + " (" + config.app.env + ")" );
+		console.log( "Database Connected:  (" + config.app.env + ")" + config.database.url );
 	} ).catch( err => {
-		console.log( "Database :" );
-		console.log( "\tDatabase Status : Not Connected" );
-		console.log( "\tMongoDB URL \t: " + config.database.url + " (" + config.app.env + ")" );
+		console.log( "\tDatabase Not Connected" );
 	} );
 
 	// Server Running Message
-	app.listen( parseInt( config.app.port[config.app.env] ), () => {
-		console.log( "Server :" );
-		console.log( "\tStatus \t\t: OK" );
-		console.log( "\tService \t: " + config.app.name + " (" + config.app.env + ")" );
-		console.log( "\tPort \t\t: " + config.app.port[config.app.env] );
+	var Server = App.listen( parseInt( config.app.port[config.app.env] ), () => {
+		console.log( "Server " + config.app.name + ":" + config.app.port[config.app.env] + " (" + config.app.env + ") is connected." );
 	} );
 
+	// Server Timeout (Minutes * Seconds * Miliseconds)
+	Server.timeout = 30 * 60 * 1000;
+
 	// Routing
-	require( './routes/api.js' )( app );
-	module.exports = app;
+	require( './routes/api.js' )( App );
+
+	// Exports
+	module.exports = App;
