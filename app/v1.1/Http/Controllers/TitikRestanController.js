@@ -40,12 +40,8 @@
                 data: []
             } );
         }
-        let locationCode = [];
-        let locationCodeGroup = String( req.auth.LOCATION_CODE ).split( ',' );
+        let locationCode = String( req.auth.LOCATION_CODE ).split( ',' );
         let querySearch = [];
-        locationCodeGroup.forEach( function ( data ) {
-            locationCode.push( data );
-        } );
         locationCode.forEach( function( location ) {
             querySearch.push( new RegExp( '^' + location.substr( 0, 4 ) ) )
         } );
