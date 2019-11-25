@@ -29,14 +29,14 @@
         if ( userRole !== 'ASISTEN_LAPANGAN' ) {
             return res.send( {
                 status: true,
-                message: 'Success!',
+                message: 'Bukan Asisten Lapangan',
                 data: []
             } );
         }
         if( reffRole !== 'AFD_CODE' ) {
             return res.send( {
                 status: true,
-                message: 'Success!',
+                message: 'Bukan AFD_CODE!',
                 data: []
             } );
         }
@@ -48,11 +48,11 @@
         try {
             let now = parseInt( Helper.date_format( 'now', 'YYYYMMDD' ) ).toString().substring( 0, 8 );
             let titikRestan = await TitikRestanSchema.find( {
-                TGL_REPORT: now,
+                TGL_REPORT: 20191124,
                 WERKS: {
                     "$in": querySearch
                 }
-            } );
+            } ).select( '-_id' );
             
             return res.send( {
                 status: true, 
