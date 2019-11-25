@@ -20,7 +20,7 @@
 | Module Exports
 |--------------------------------------------------------------------------
 */
-	exports.create_or_update_v_1_0 = async ( req, res ) => {
+	exports.create_or_update = async ( req, res ) => {
 		var body = {
 			WERKS: req.body.WERKS,
 			AFD_CODE: req.body.AFD_CODE,
@@ -90,7 +90,7 @@
 		}
 	}
 
-	exports.find_by_periode_v_1_0 = async ( req, res ) => {
+	exports.find_by_periode = async ( req, res ) => {
 		var query = await ClassBlockSchema.aggregate( [
 			{
 				$project: {

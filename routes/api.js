@@ -12,6 +12,14 @@
 
 	// Controllers Variable
 	const Controllers = {
+		v_1_1: {
+			ClassBlockController: require( _directory_base + '/app/v1.1/Http/Controllers/ClassBlockController.js' ),
+			InspectionBarisController: require( _directory_base + '/app/v1.1/Http/Controllers/InspectionBarisController.js' )
+		},
+		v_1_0: {
+			ClassBlockController: require( _directory_base + '/app/v1.0/Http/Controllers/ClassBlockController.js' ),
+			InspectionBarisController: require( _directory_base + '/app/v1.0/Http/Controllers/InspectionBarisController.js' )
+		},
 		V1: {
 			ClassBlockController: require( _directory_base + '/app/Http/Controllers/V1/ClassBlockController.js' ),
 			InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' )
@@ -49,6 +57,28 @@
 				} )
 			} );
 		
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | API 1.0
+		 |--------------------------------------------------------------------------
+		 */
+
+		app.post( '/api/v1.0/report/class-block',  Controllers.v_1_0.ClassBlockController.create_or_update );
+
+		app.get( '/api/v1.0/report/class-block/periode/:werks/:date', Controllers.v_1_0.ClassBlockController.find_by_periode );
+
+		app.get( '/api/v1.0/report/inspection-baris/:location/:start_date/:end_date', Controllers.v_1_0.InspectionBarisController.find );
+
+		app.get( '/api/v1.0/report/inspection-baris-valid/:location/:periode',  Controllers.v_1_0.InspectionBarisController.find_valid );
+
+		app.post( '/api/v1.0/report/inspection-baris',  Controllers.v_1_0.InspectionBarisController.create_or_update );
+
+		/*
+		 |--------------------------------------------------------------------------
+		 | Old API
+		 |--------------------------------------------------------------------------
+		 */
 		app.post( '/api/report/class-block', routes_versioning( {
 			"1.0.0": Controllers.V1.ClassBlockController.create_or_update_v_1_0
 		} ) );

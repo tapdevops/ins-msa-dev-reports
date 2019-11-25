@@ -17,7 +17,7 @@
 | Module Exports
 |--------------------------------------------------------------------------
 */
-	exports.create_or_update_v_1_0 = async ( req, res ) => {
+	exports.create_or_update = async ( req, res ) => {
 
 		var query = await InspectionBarisSchema.findOne( {
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
@@ -91,7 +91,7 @@
 		}
 	}
 
-	exports.backup_create_or_update_v_1_0 = async ( req, res ) => {
+	exports.backup_create_or_update = async ( req, res ) => {
 
 		var query = await InspectionBarisSchema.findOne( {
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
