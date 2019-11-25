@@ -7,17 +7,17 @@
  |
  */
  	// Models
-	const InspectionBarisSchema = require( _directory_base + '/app/Http/Models/V1/InspectionBarisSchema.js' );
+	const InspectionBarisSchema = require( _directory_base + '/app/v1.1/Http/Models/InspectionBarisSchema.js' );
 
 	// Middleware
-	const Date = require( _directory_base + '/app/Http/Middleware/Date.js' );
+	const Date = require( _directory_base + '/app/v1.1/Http/Middleware/Date.js' );
 
 /*
 |--------------------------------------------------------------------------
 | Module Exports
 |--------------------------------------------------------------------------
 */
-	exports.create_or_update_v_1_0 = async ( req, res ) => {
+	exports.create_or_update = async ( req, res ) => {
 
 		var query = await InspectionBarisSchema.findOne( {
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
@@ -91,7 +91,7 @@
 		}
 	}
 
-	exports.backup_create_or_update_v_1_0 = async ( req, res ) => {
+	exports.backup_create_or_update = async ( req, res ) => {
 
 		var query = await InspectionBarisSchema.findOne( {
 			BLOCK_INSPECTION_CODE: req.body.BLOCK_INSPECTION_CODE,
@@ -210,7 +210,7 @@
 	}
 	
 
-	exports.find_v_1_0 = async ( req, res ) => {
+	exports.find = async ( req, res ) => {
 		if ( req.params.start_date && req.params.end_date && req.params.location ) {
 			var location = req.params.location
 			if ( location.substr( 0, 1) == '0' )  {
@@ -244,7 +244,7 @@
 		}
 	}
 
-	exports.find_valid_v_1_0 = async ( req, res ) => {
+	exports.find_valid = async ( req, res ) => {
 
 		if ( req.params.periode && req.params.location ) {
 			var periode = parseInt( req.params.periode.substr( 0,6 ) );
