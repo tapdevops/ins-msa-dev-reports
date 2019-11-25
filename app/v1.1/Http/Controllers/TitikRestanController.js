@@ -15,23 +15,58 @@
      // Middleware
      const Date = require( _directory_base + '/app/v1.1/Http/Middleware/Date.js' );
 
+     //Helper
+     const Helper = require( _directory_base + '/app/v1.1/Http/Libraries/Helper.js' );
+
 /*
  |--------------------------------------------------------------------------
  | Module Exports
  |--------------------------------------------------------------------------
 */
     exports.titik_restan = async ( req, res ) => {
+        let userRole = req.auth.USER_ROLE;
+        let reffRole = req.auth.REFFERENCE_ROLE;
+        if ( userRole !== 'ASISTEN_LAPANGAN' ) {
+            return res.send( {
+                status: true,
+                message: 'Success!',
+                data: []
+            } );
+        }
+        if( reffRole !== 'AFD_CODE' ) {
+            return res.send( {
+                status: true,
+                message: 'Success!',
+                data: []
+            } );
+        }
+        let locationCode = [];
+        let locationCodeGroup = String( req.auth.LOCATION_CODE ).split( ',' );
+        let querySearch = [];
+        locationCodeGroup.forEach( function ( data ) {
+            locationCode.push( data );
+        } );
+        locationCode.forEach( function( location ) {
+            querySearch.push( new RegExp( '^' + location.substr( 0, 4 ) ) )
+        } );
         try {
-            let titikRestan = await TitikRestanSchema.find( {} );
+            let now = parseInt( Helper.date_format( 'now', 'YYYYMMDD' ) ).toString().substring( 0, 8 );
+            let titikRestan = await TitikRestanSchema.find( {
+                TGL_REPORT: now,
+                WERKS: {
+                    "$in": querySearch
+                }
+            } );
+            
             return res.send( {
                 status: true, 
-                message: 'Success!',
+                message: 'Success',
                 data: titikRestan
             } );
         } catch( err ) {
             return res.send( {
                 status: false, 
-                message: err.message,
+                message: config.error_message.create_500,
                 data: []
             } );
         }
