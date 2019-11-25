@@ -14,12 +14,9 @@
 	const Controllers = {
 		v_1_1: {
 			ClassBlockController: require( _directory_base + '/app/v1.1/Http/Controllers/ClassBlockController.js' ),
-			InspectionBarisController: require( _directory_base + '/app/v1.1/Http/Controllers/InspectionBarisController.js' )
+			InspectionBarisController: require( _directory_base + '/app/v1.1/Http/Controllers/InspectionBarisController.js' ),
+			TitikRestanController: require( _directory_base + '/app/v1.1/Http/Controllers/TitikRestanController.js' )
 		}
-		// V1: {
-		// 	ClassBlockController: require( _directory_base + '/app/Http/Controllers/V1/ClassBlockController.js' ),
-		// 	InspectionBarisController: require( _directory_base + '/app/Http/Controllers/V1/InspectionBarisController.js' )
-		// }
 	}
 
 /*
@@ -56,7 +53,7 @@
 
 		/*
 		 |--------------------------------------------------------------------------
-		 | API 1.0
+		 | API 1.1
 		 |--------------------------------------------------------------------------
 		 */
 
@@ -70,31 +67,7 @@
 
 		app.post( '/api/v1.1/report/inspection-baris',  Controllers.v_1_1.InspectionBarisController.create_or_update );
 
-		/*
-		 |--------------------------------------------------------------------------
-		 | Old API
-		 |--------------------------------------------------------------------------
-		 */
-		app.post( '/api/report/class-block', routes_versioning( {
-			"1.0.0": Controllers.v_1_1.ClassBlockController.create_or_update
-		} ) );
-
-		// app.get( '/api/report/class-block/periode/:werks/:date', routes_versioning( {
-		// 	"1.0.0": Controllers.V1.ClassBlockController.find_by_periode_v_1_0
-		// } ) );
-
-		// app.get( '/api/report/inspection-baris/:location/:start_date/:end_date', routes_versioning( {
-		// 	"1.0.0": Controllers.V1.InspectionBarisController.find_v_1_0
-		// } ) );
-
-		// app.get( '/api/report/inspection-baris-valid/:location/:periode', routes_versioning( {
-		// 	"1.0.0": Controllers.V1.InspectionBarisController.find_valid_v_1_0
-		// } ) );
-
-		// app.post( '/api/report/inspection-baris', routes_versioning( {
-		// 	"1.0.0": Controllers.V1.InspectionBarisController.create_or_update_v_1_0
-		// } ) );
-
+		app.get( '/api/v1.1/report/titik-restan', Controllers.v_1_1.TitikRestanController.titik_restan );
 	}
 
 /*
