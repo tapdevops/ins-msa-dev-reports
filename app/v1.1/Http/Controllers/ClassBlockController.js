@@ -7,20 +7,20 @@
  |
  */
  	// Models
-	const ClassBlockSchema = require( _directory_base + '/app/Http/Models/V1/ClassBlockSchema.js' );
+	const ClassBlockSchema = require( _directory_base + '/app/v1.1/Http/Models/ClassBlockSchema.js' );
 
 	// Variable
 	const config = require( _directory_base + '/config/app.js' );
 
 	// Middleware
-	const Date = require( _directory_base + '/app/Http/Middleware/Date.js' );
+	const Date = require( _directory_base + '/app/v1.1/Http/Middleware/Date.js' );
 
 /*
 |--------------------------------------------------------------------------
 | Module Exports
 |--------------------------------------------------------------------------
 */
-	exports.create_or_update_v_1_0 = async ( req, res ) => {
+	exports.create_or_update = async ( req, res ) => {
 		var body = {
 			WERKS: req.body.WERKS,
 			AFD_CODE: req.body.AFD_CODE,
@@ -90,7 +90,7 @@
 		}
 	}
 
-	exports.find_by_periode_v_1_0 = async ( req, res ) => {
+	exports.find_by_periode = async ( req, res ) => {
 		var query = await ClassBlockSchema.aggregate( [
 			{
 				$project: {
