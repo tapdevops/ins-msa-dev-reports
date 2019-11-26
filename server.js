@@ -21,6 +21,13 @@
 	// Primary Variable
 	const app = express();
 
+	//Models
+	const TitikRestan = require( _directory_base + '/app/v1.1/Http/Models/TitikRestanSchema.js' );
+	const KafkaPayload = require( _directory_base + '/app/v1.1/Http/Models/KafkaPayloadSchema.js' );
+
+	//Helper
+	const Helper = require( _directory_base + '/app/v1.1/Http/Libraries/Helper.js' );
+
 /*
 |--------------------------------------------------------------------------
 | APP Init
@@ -54,6 +61,97 @@
 		console.log( "\tService \t: " + config.app.name + " (" + config.app.env + ")" );
 		console.log( "\tPort \t\t: " + config.app.port[config.app.env] );
 	} );
+
+/*
+|--------------------------------------------------------------------------
+| Kafka Consumer
+|--------------------------------------------------------------------------
+*/
+	const kafka = require( 'kafka-node' );
+	const Consumer = kafka.Consumer;
+	const Offset = kafka.Offset;
+	const Client = kafka.KafkaClient;
+	const topic = 'WEB_REPORT_TITIK_RESTAN';
+	// const topic = 'test_hehehe_001';
+
+	const client = new Client( { kafkaHost: config.app.kafka[config.app.env].server_host } );
+	const topics = [
+		{ topic: topic, partition: 0 }
+	];
+	const options = { 
+		autoCommit: false, 
+		fetchMaxWaitMs: 1000, 
+		fetchMaxBytes: 1024 * 1024
+	};
+
+	const consumer = new Consumer(client, topics, options);
+	const offset = new Offset(client);
+
+	consumer.on( 'message', async ( message ) => {
+		var checkPayload = await KafkaPayload.findOne( { TOPIC_NAME: message.topic } );
+		try {
+			if( message ) {
+				if ( message.offset > checkPayload.OFFSET ) {
+					let isJSONString = this.isJSONString( message.value );
+					console.log( isJSONString );
+					if ( isJSONString ) {
+						let data = JSON.parse( message.value );	
+						if( data ) {
+							let set = new TitikRestan ( {
+								OPH:data.OPH,
+								BCC: data.BCC,
+								TPH_RESTANT_DAY: data.TPHRD,
+								LATITUDE: data.LAT,
+								LONGITUDE: data.LON,
+								JML_JANJANG: data.JMLJJ,
+								JML_BRONDOLAN: data.JMLBD,
+								KG_TAKSASI: data.KGTKS,
+								TGL_REPORT: data.TGLRP,
+								WERKS: data.WERKS,
+								EST_NAME: data.EST_NAME,
+								AFD_CODE: data.AFD_CODE,
+								BLOCK_CODE: data.BLOCK_CODE,
+								BLOCK_NAME: data.BLOCK_NAME
+							} );
+							set.save();			
+							KafkaPayload.findOneAndUpdate( { 
+								TOPIC_NAME: message.topic
+							}, {
+								OFFSET: message.offset
+							} );
+						}	
+					} else {
+						console.log( message.value );
+					}
+					
+				}
+			} 
+		} catch ( err ) {
+			console.log( err );
+		}
+	} );
+	this.isJSONString = ( str ) => {
+		try {
+			JSON.parse( str );
+			return true;
+		} catch ( err ) {
+			return false;
+		}
+	}
+	consumer.on( 'error', function( err ) {
+		console.log( 'error', err );
+	} );
+
+	consumer.on( 'offsetOutOfRange', function( topic ) {
+		topic.maxNum = 2;
+		offset.fetch([topic], function( err, offsets ) {
+			if( err ) {
+				return console.error( err );
+			}
+			var min = Math.min.apply( null, offsets[topic.topic][topic.partition] );
+			consumer.setOffset( topic.topic, topic.partition, min );
+		});
+	});
 
 	// Routing
 	require( './routes/api.js' )( app );
