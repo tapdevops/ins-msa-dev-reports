@@ -72,8 +72,6 @@
 	const Offset = kafka.Offset;
 	const Client = kafka.KafkaClient;
 	const topic = 'WEB_REPORT_TITIK_RESTAN';
-	// const topic = 'test_hehehe_001';
-
 	const client = new Client( { kafkaHost: config.app.kafka[config.app.env].server_host } );
 	const topics = [
 		{ topic: topic, partition: 0 }
@@ -86,58 +84,41 @@
 
 	const consumer = new Consumer(client, topics, options);
 	const offset = new Offset(client);
-
-	consumer.on( 'message', async ( message ) => {
-		var checkPayload = await KafkaPayload.findOne( { TOPIC_NAME: message.topic } );
-		try {
-			if( message ) {
-				if ( message.offset > checkPayload.OFFSET ) {
-					let isJSONString = this.isJSONString( message.value );
-					console.log( isJSONString );
-					if ( isJSONString ) {
-						let data = JSON.parse( message.value );	
-						if( data ) {
-							let set = new TitikRestan ( {
-								OPH:data.OPH,
-								BCC: data.BCC,
-								TPH_RESTANT_DAY: data.TPHRD,
-								LATITUDE: data.LAT,
-								LONGITUDE: data.LON,
-								JML_JANJANG: data.JMLJJ,
-								JML_BRONDOLAN: data.JMLBD,
-								KG_TAKSASI: data.KGTKS,
-								TGL_REPORT: data.TGLRP,
-								WERKS: data.WERKS,
-								EST_NAME: data.EST_NAME,
-								AFD_CODE: data.AFD_CODE,
-								BLOCK_CODE: data.BLOCK_CODE,
-								BLOCK_NAME: data.BLOCK_NAME
-							} );
-							set.save();			
-							KafkaPayload.findOneAndUpdate( { 
-								TOPIC_NAME: message.topic
-							}, {
-								OFFSET: message.offset
-							} );
-						}	
-					} else {
-						console.log( message.value );
-					}
-					
+	
+	consumer.on( 'message', ( message ) => {
+		if( message ) {
+			let data = JSON.parse( message.value );
+			TitikRestan.findOne( { BCC: data.BCC } ).then( bcc => {
+				if ( !bcc ) {
+					if( data ) {
+						let set = new TitikRestan ( {
+							OPH:data.OPH,
+							BCC: data.BCC,
+							TPH_RESTANT_DAY: data.TPHRD,
+							LATITUDE: data.LAT,
+							LONGITUDE: data.LON,
+							JML_JANJANG: data.JMLJJ,
+							JML_BRONDOLAN: data.JMLBD,
+							KG_TAKSASI: data.KGTKS,
+							TGL_REPORT: data.TGLRP,
+							WERKS: data.WERKS,
+							EST_NAME: data.EST_NAME,
+							AFD_CODE: data.AFD_CODE,
+							BLOCK_CODE: data.BLOCK_CODE,
+							BLOCK_NAME: data.BLOCK_NAME
+						} );
+						set.save()		
+						.then( () => {
+							console.log( 'sukses simpan' );
+						} )
+						.catch( err => {
+							console.log( err.message );
+						} );
+					}			
 				}
-			} 
-		} catch ( err ) {
-			console.log( err );
-		}
+			} );
+		} 
 	} );
-	this.isJSONString = ( str ) => {
-		try {
-			JSON.parse( str );
-			return true;
-		} catch ( err ) {
-			return false;
-		}
-	}
 	consumer.on( 'error', function( err ) {
 		console.log( 'error', err );
 	} );
