@@ -73,6 +73,8 @@
 		app.post( '/api/v1.1/report/inspection-baris',  Controllers.v_1_1.InspectionBarisController.create_or_update );
 
 		app.get( '/api/v1.1/report/titik-restan', Middleware.v_1_1.VerifyToken, Controllers.v_1_1.TitikRestanController.titik_restan );
+
+		app.get( '/api/v1.1/report/titik-restan/all/:date', Controllers.v_1_1.TitikRestanController.titik_restan_all );
 	}
 
 /*

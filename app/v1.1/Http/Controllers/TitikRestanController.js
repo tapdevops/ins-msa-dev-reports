@@ -67,3 +67,44 @@
             } );
         }
     }
+
+    //get all titik restan
+    exports.titik_restan_all = async ( req, res ) => {
+        let result = [];
+        try {
+            let titikRestan = await TitikRestanSchema.aggregate([
+                {
+                    $group: {
+                        _id: {
+                            AFD_CODE: "$AFD_CODE",
+                            TGL_REPORT: "$TGL_REPORT",
+                            WERKS: "$WERKS"
+                        },TOTAL: {  $sum: "$KG_TAKSASI"}}
+                },
+                {
+                    $match: {
+                        "_id.TGL_REPORT" : parseInt( req.params.date )
+                    }
+                }
+            ]);
+            if ( titikRestan.length > 0 ) {
+                titikRestan.forEach( restan => {
+                    result.push( {
+                        OTORISASI: restan['_id'].WERKS + restan['_id'].AFD_CODE,
+                        TOTAL: restan.TOTAL
+                    } )
+                } );    
+            }
+            return res.send( {
+                status: true,
+                message: 'Success',
+                data: result
+            } )
+        } catch ( err ) {
+            return res.send( {
+                status: false,
+                message: config.app.error_message.find_500,
+                data: []
+            } )
+        }
+    }
