@@ -103,7 +103,7 @@
         } catch ( err ) {
             return res.send( {
                 status: false,
-                message: config.app.error_message.find_500,
+                message: config.error_message.find_500,
                 data: []
             } )
         }
