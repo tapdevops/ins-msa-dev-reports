@@ -41,19 +41,25 @@
             } );
         }
         let locationCode = String( req.auth.LOCATION_CODE ).split( ',' );
-        let querySearch = [];
+        let werksQuerySearch = [];
+        let afdQuerySearch = [];
         locationCode.forEach( function( location ) {
-            querySearch.push( new RegExp( '^' + location.substr( 0, 4 ) ) )
+            werksQuerySearch.push( location.substring( 0, 4 ) );
+            afdQuerySearch.push( location.substring( 4, 5 ) );
         } );
         try {
             let now = parseInt( Helper.date_format( 'now', 'YYYYMMDD' ) ).toString().substring( 0, 8 );
-            let titikRestan = await TitikRestanSchema.find( {
-                TGL_REPORT: 20191124,
-                WERKS: {
-                    "$in": querySearch
+            let titikRestan = await TitikRestanSchema.aggregate( [
+                {
+                    $match: {
+                        TGL_REPORT: 20191124, //Hardcode,
+                        $and: [
+                            { WERKS: {$in: werksQuerySearch } },
+                            { AFD_CODE: { $in: afdQuerySearch } }
+                        ]
+                    }
                 }
-            } ).select( '-_id' );
-            
+            ] );
             return res.send( {
                 status: true, 
                 message: 'Success',
@@ -62,7 +68,7 @@
         } catch( err ) {
             return res.send( {
                 status: false, 
-                message: config.error_message.create_500,
+                message: config.error_message.find_500,
                 data: []
             } );
         }
