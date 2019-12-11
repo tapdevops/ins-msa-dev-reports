@@ -48,15 +48,17 @@
             afdQuerySearch.push( location.substring( 4, 5 ) );
         } );
         try {
-            let now = parseInt( Helper.date_format( 'now', 'YYYYMMDD' ) ).toString().substring( 0, 8 );
+            let date = parseInt( Helper.date_format( 'now', 'YYYYMMDD' ) ).toString().substring( 0, 8 ) - 1;
             let titikRestan = await TitikRestanSchema.aggregate( [
                 {
                     $match: {
                         TGL_REPORT: 20191124, //Hardcode,
-                        $and: [
-                            { WERKS: {$in: werksQuerySearch } },
-                            { AFD_CODE: { $in: afdQuerySearch } }
-                        ]
+                        WERKS: { $in: werksQuerySearch },
+                        AFD_CODE: { $in: afdQuerySearch } 
+                    }
+                }, {
+                    $project: {
+                        _id: 0
                     }
                 }
             ] );
@@ -74,10 +76,11 @@
         }
     }
 
-    //get all titik restan
-    exports.titik_restan_all = async ( req, res ) => {
+    //get kg taksasi
+    exports.taksasi = async ( req, res ) => {
         let result = [];
         try {
+            let date = parseInt( Helper.date_format( 'now', 'YYYYMMDD' ) ).toString().substring( 0, 8 ) - 1;
             let titikRestan = await TitikRestanSchema.aggregate([
                 {
                     $group: {
@@ -85,11 +88,11 @@
                             AFD_CODE: "$AFD_CODE",
                             TGL_REPORT: "$TGL_REPORT",
                             WERKS: "$WERKS"
-                        },TOTAL: {  $sum: "$KG_TAKSASI"}}
+                        },TOTAL: {  $sum: "$KG_TAKSASI"} }
                 },
                 {
                     $match: {
-                        "_id.TGL_REPORT" : parseInt( req.params.date )
+                        "_id.TGL_REPORT" : 20191124 //hardcode
                     }
                 }
             ]);
@@ -111,6 +114,6 @@
                 status: false,
                 message: config.error_message.find_500,
                 data: []
-            } )
+            } );
         }
     }

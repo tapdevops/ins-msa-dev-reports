@@ -24,7 +24,8 @@ const titikRestanSchema = mongoose.Schema( {
     EST_NAME: String,
     AFD_CODE: String,
     BLOCK_CODE: String,
-    BLOCK_NAME: String
+    BLOCK_NAME: String,
+    SORT_SWIPE: String
 } );
 
 module.exports = mongoose.model( 'TitikRestanModel', titikRestanSchema, 'TR_TITIK_RESTAN' );

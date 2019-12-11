@@ -106,7 +106,8 @@
 								EST_NAME: data.EST_NAME,
 								AFD_CODE: data.AFD_CODE,
 								BLOCK_CODE: data.BLOCK_CODE,
-								BLOCK_NAME: data.BLOCK_NAME
+								BLOCK_NAME: data.BLOCK_NAME,
+								SORT_SWIPE: data.AFD_CODE + data.BLOCK_CODE + data.OPH
 							} );
 							set.save()		
 							.then( () => {

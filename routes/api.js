@@ -61,20 +61,13 @@
 		 | API 1.1
 		 |--------------------------------------------------------------------------
 		 */
-
 		app.post( '/api/v1.1/report/class-block',  Controllers.v_1_1.ClassBlockController.create_or_update );
-
 		app.get( '/api/v1.1/report/class-block/periode/:werks/:date', Controllers.v_1_1.ClassBlockController.find_by_periode );
-
 		app.get( '/api/v1.1/report/inspection-baris/:location/:start_date/:end_date', Controllers.v_1_1.InspectionBarisController.find );
-
 		app.get( '/api/v1.1/report/inspection-baris-valid/:location/:periode',  Controllers.v_1_1.InspectionBarisController.find_valid );
-
 		app.post( '/api/v1.1/report/inspection-baris',  Controllers.v_1_1.InspectionBarisController.create_or_update );
-
 		app.get( '/api/v1.1/report/titik-restan', Middleware.v_1_1.VerifyToken, Controllers.v_1_1.TitikRestanController.titik_restan );
-
-		app.get( '/api/v1.1/report/taksasi/:date', Middleware.v_1_1.VerifyToken, Controllers.v_1_1.TitikRestanController.titik_restan_all );
+		app.get( '/api/v1.1/report/taksasi', Middleware.v_1_1.VerifyToken, Controllers.v_1_1.TitikRestanController.taksasi );
 	}
 
 /*
