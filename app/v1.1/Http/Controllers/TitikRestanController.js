@@ -92,7 +92,7 @@
                 },
                 {
                     $match: {
-                        "_id.TGL_REPORT" : 20191124 //hardcode
+                        "_id.TGL_REPORT" : 20191124//hardcode 
                     }
                 }
             ]);
