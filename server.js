@@ -89,7 +89,7 @@
 		if( message ) {
 			try {
 				let data = JSON.parse( message.value );
-				TitikRestan.findOne( { BCC: data.BCC } ).then( bcc => {
+				TitikRestan.findOne( { BCC: data.BCC }, { TGL_REPORT: data.TGLRP } ).then( bcc => {
 					if ( !bcc ) {
 						if( data ) {
 							let set = new TitikRestan ( {
@@ -117,6 +117,8 @@
 								console.log( err.message );
 							} );
 						}			
+					} else {
+						console.log( 'Data sudah ada!' );
 					}
 				} );
 			} catch ( err ) {
