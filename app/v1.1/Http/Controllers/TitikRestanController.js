@@ -52,7 +52,7 @@
             let titikRestan = await TitikRestanSchema.aggregate( [
                 {
                     $match: {
-                        TGL_REPORT: 20191124, //Hardcode,
+                        TGL_REPORT: date, //Hardcode,
                         WERKS: { $in: werksQuerySearch },
                         AFD_CODE: { $in: afdQuerySearch } 
                     }
@@ -92,7 +92,7 @@
                 },
                 {
                     $match: {
-                        "_id.TGL_REPORT" : 20191124//hardcode 
+                        "_id.TGL_REPORT" : date//hardcode 
                     }
                 }
             ]);
