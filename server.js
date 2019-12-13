@@ -85,7 +85,7 @@
 	const consumer = new Consumer(client, topics, options);
 	const offset = new Offset(client);
 	
-	consumer.on( 'message', ( message ) => {
+	consumer.on( 'message', async ( message ) => {
 		if( message ) {
 			try {
 				let data = JSON.parse( message.value );
@@ -118,7 +118,7 @@
 						} );
 					}			
 				} else {
-					console.log( 'Data sudah ada!' );
+					console.log( `Data sudah ada!` );
 				}
 			} catch ( err ) {
 				console.log( 'Format json message salah' );
