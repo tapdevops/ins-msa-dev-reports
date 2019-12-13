@@ -89,38 +89,37 @@
 		if( message ) {
 			try {
 				let data = JSON.parse( message.value );
-				TitikRestan.findOne( { BCC: data.BCC }, { TGL_REPORT: data.TGLRP } ).then( bcc => {
-					if ( !bcc ) {
-						if( data ) {
-							let set = new TitikRestan ( {
-								OPH:data.OPH,
-								BCC: data.BCC,
-								TPH_RESTANT_DAY: data.TPHRD,
-								LATITUDE: data.LAT,
-								LONGITUDE: data.LON,
-								JML_JANJANG: data.JMLJJ,
-								JML_BRONDOLAN: data.JMLBD,
-								KG_TAKSASI: data.KGTKS,
-								TGL_REPORT: data.TGLRP,
-								WERKS: data.WERKS,
-								EST_NAME: data.EST_NAME,
-								AFD_CODE: data.AFD_CODE,
-								BLOCK_CODE: data.BLOCK_CODE,
-								BLOCK_NAME: data.BLOCK_NAME,
-								SORT_SWIPE: data.AFD_CODE + data.BLOCK_CODE + data.OPH
-							} );
-							set.save()		
-							.then( () => {
-								console.log( 'sukses simpan' );
-							} )
-							.catch( err => {
-								console.log( err.message );
-							} );
-						}			
-					} else {
-						console.log( 'Data sudah ada!' );
-					}
-				} );
+				let count = await TitikRestan.find( { BCC: data.BCC, TGL_REPORT: data.TGLRP } ).count();
+				if ( count === 0 ) {
+					if( data ) {
+						let set = new TitikRestan ( {
+							OPH:data.OPH,
+							BCC: data.BCC,
+							TPH_RESTANT_DAY: data.TPHRD,
+							LATITUDE: data.LAT,
+							LONGITUDE: data.LON,
+							JML_JANJANG: data.JMLJJ,
+							JML_BRONDOLAN: data.JMLBD,
+							KG_TAKSASI: data.KGTKS,
+							TGL_REPORT: data.TGLRP,
+							WERKS: data.WERKS,
+							EST_NAME: data.EST_NAME,
+							AFD_CODE: data.AFD_CODE,
+							BLOCK_CODE: data.BLOCK_CODE,
+							BLOCK_NAME: data.BLOCK_NAME,
+							SORT_SWIPE: data.AFD_CODE + data.BLOCK_CODE + data.OPH
+						} );
+						set.save()		
+						.then( () => {
+							console.log( 'sukses simpan' );
+						} )
+						.catch( err => {
+							console.log( err.message );
+						} );
+					}			
+				} else {
+					console.log( 'Data sudah ada!' );
+				}
 			} catch ( err ) {
 				console.log( 'Format json message salah' );
 			}
