@@ -22,11 +22,11 @@ const mongoose = require('mongoose');
 const app = express();
 
 //Models
-const TitikRestan = require(_directory_base + '/app/v1.2/Http/Models/TitikRestanSchema.js');
-const KafkaPayload = require(_directory_base + '/app/v1.2/Http/Models/KafkaPayloadSchema.js');
+const TitikRestan = require(_directory_base + '/app/v2.0/Http/Models/TitikRestanSchema.js');
+const KafkaPayload = require(_directory_base + '/app/v2.0/Http/Models/KafkaPayloadSchema.js');
 
 //Helper
-const Helper = require(_directory_base + '/app/v1.2/Http/Libraries/Helper.js');
+const Helper = require(_directory_base + '/app/v2.0/Http/Libraries/Helper.js');
 
 /*
 |--------------------------------------------------------------------------
