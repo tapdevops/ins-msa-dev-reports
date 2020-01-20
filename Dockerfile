@@ -1,4 +1,4 @@
-FROM node:12
+FROM oraclelinux:7-slim
 
 # Install Required Plugin
 RUN yum update -y && \
@@ -11,7 +11,7 @@ RUN yum update -y && \
 	npm --version && \
 	npm install oracledb && \
 	echo Installed
-    
+
 # Create app directory
 WORKDIR /usr/src/app
 
