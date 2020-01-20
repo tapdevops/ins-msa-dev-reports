@@ -118,7 +118,7 @@ consumer.on('message', async (message) => {
 						});
 				}
 			} else {
-				console.log(`Data sudah ada!`);
+				// console.log(`Data sudah ada!`);
 			}
 		} catch (err) {
 			console.log('Format json message salah');

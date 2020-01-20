@@ -26,6 +26,9 @@ const Controllers = {
 		ClassBlockController: require(_directory_base + '/app/v1.1/Http/Controllers/ClassBlockController.js'),
 		InspectionBarisController: require(_directory_base + '/app/v1.1/Http/Controllers/InspectionBarisController.js'),
 		TitikRestanController: require(_directory_base + '/app/v1.1/Http/Controllers/TitikRestanController.js')
+	},
+	v_1_0: {
+		PetaPanenController: require(_directory_base + '/app/v1.0/Http/Controllers/PetaPanenController.js')
 	}
 }
 const Middleware = {
@@ -73,7 +76,7 @@ module.exports = (app) => {
 
 	/*
 	 |--------------------------------------------------------------------------
-	 | API 1.2
+	 | API 2.0
 	 |--------------------------------------------------------------------------
 	 */
 	app.post('/api/v2.0/report/class-block', Controllers.v_2_0.ClassBlockController.create_or_update);
@@ -112,6 +115,17 @@ module.exports = (app) => {
 	app.get('/api/v1.1/report/titik-restan', Middleware.v_1_1.VerifyToken, Controllers.v_1_1.TitikRestanController.titik_restan);
 
 	app.get('/api/v1.1/report/taksasi', Middleware.v_1_1.VerifyToken, Controllers.v_1_1.TitikRestanController.taksasi);
+
+	/*
+	 |--------------------------------------------------------------------------
+	 | API 1.0
+	 |--------------------------------------------------------------------------
+	 */
+
+	 //Untuk get data peta panen header dan detail
+	 app.get('/api/v1.0/peta-panen/header', Middleware.v_2_0.VerifyToken, Controllers.v_1_0.PetaPanenController.petaPanenHeader);
+	 app.get('/api/v1.0/peta-panen/detail', Middleware.v_2_0.VerifyToken, Controllers.v_1_0.PetaPanenController.petaPanenDetail);
+
 }
 
 /*
